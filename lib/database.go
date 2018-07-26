@@ -100,3 +100,16 @@ func (db *DBConn) CloseSession() {
 	db.session.Close()
 	log.Println("Database connection closed")
 }
+
+// OnChange boradcast message to clients when defined table changes
+func (db *DBConn) OnChange(table string, hub *Hub) {
+	res, err := r.Table(table).Changes().Run(db.session)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	log.Printf("Monitoring changes on table: %s", table)
+	var value interface{}
+	for res.Next(&value) {
+		hub.broadcast <- value
+	}
+}

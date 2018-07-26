@@ -3,6 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
+	"os"
+	"os/signal"
+	"syscall"
 
 	m "github.com/hydra-cluster/monitor/lib"
 )
@@ -26,5 +30,16 @@ func main() {
 
 	if *initDB {
 		db.Init()
+		return
 	}
+
+	go m.StartWebsocketServer(db)
+
+	c := make(chan os.Signal)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	<-c
+	fmt.Println("")
+	db.CloseSession()
+	log.Println("Server terminated")
+	os.Exit(1)
 }

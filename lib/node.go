@@ -44,7 +44,7 @@ type NetworkInterface struct {
 //Update reload node attributes
 func (n *Node) Update() {
 	n.Hostname, _ = os.Hostname()
-	n.Distro = getServerInfo("")
+	n.Distro = getServerInfo("uname -a")
 	n.IP = getOutboundIP().To4().String()
 	n.UpdatedDate = time.Now()
 	getInterfaces(&n.NetworkInterfaces)
