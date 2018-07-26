@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 
-	m "github.com/hydra-cluster/monitor"
+	m "github.com/hydra-cluster/monitor/lib"
 )
 
 var dbAddress, dbName string

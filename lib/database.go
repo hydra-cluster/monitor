@@ -1,4 +1,4 @@
-package monitor
+package lib
 
 import (
 	"log"
@@ -75,15 +75,20 @@ func (db *DBConn) Init() {
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
-	err = r.DB(databaseName).TableCreate(DBLogTable).Exec(db.session)
+	rDB := r.DB(databaseName)
+	err = rDB.TableCreate(DBLogTable).Exec(db.session)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
-	err = r.DB(databaseName).TableCreate(DBNodesTable).Exec(db.session)
+	err = rDB.Table(DBLogTable).IndexCreate("hostname").Exec(db.session)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
-	err = r.DB(databaseName).Table(DBNodesTable).IndexCreate("hostname").Exec(db.session)
+	err = rDB.TableCreate(DBNodesTable).Exec(db.session)
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+	err = rDB.Table(DBNodesTable).IndexCreate("hostname").Exec(db.session)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}

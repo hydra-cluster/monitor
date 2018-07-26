@@ -9,7 +9,7 @@ import (
 	"syscall"
 	"time"
 
-	m "github.com/hydra-cluster/monitor"
+	m "github.com/hydra-cluster/monitor/lib"
 )
 
 var dbAddress, dbName string
@@ -41,13 +41,15 @@ func main() {
 	}()
 
 	log.Println("Agent ready")
-	ticker := time.NewTicker(5 * time.Second)
+	ticker5s := time.NewTicker(5 * time.Second)
+	ticker5m := time.NewTicker(5 * time.Minute)
 	for {
 		select {
-		case <-ticker.C:
-			//db.Insert("logs", nil)
-			node.Flush()
-			log.Printf("New node log >> %s", node.Hostname)
+		case <-ticker5s.C:
+			db.Insert(m.DBLogTable, node.NewLog())
+		case <-ticker5m.C:
+			node.Update()
+			db.Update(m.DBNodesTable, node.ID, node)
 		}
 	}
 }
