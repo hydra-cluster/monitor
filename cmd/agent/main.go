@@ -12,13 +12,10 @@ import (
 	m "github.com/hydra-cluster/monitor/lib"
 )
 
-var (
-	dbAddress      string
-	updateInterval int
-)
+var dbAddress string
 
 func main() {
-	flag.StringVar(&dbAddress, "dburl", "localhost:28015", "Database address URL")
+	flag.StringVar(&dbAddress, "url", "localhost:28015", "Database address URL")
 
 	flag.Parse()
 
