@@ -12,11 +12,13 @@ import (
 	m "github.com/hydra-cluster/monitor/lib"
 )
 
-var dbAddress, dbName string
+var (
+	dbAddress      string
+	updateInterval int
+)
 
 func main() {
 	flag.StringVar(&dbAddress, "dburl", "localhost:28015", "Database address URL")
-	flag.StringVar(&dbName, "dbname", m.DBDefaultName, "Database name")
 
 	flag.Parse()
 
@@ -24,11 +26,11 @@ func main() {
 	fmt.Println("Hydra Cluster Monitor - Agent - v1.0")
 	fmt.Println("------------------------------------")
 
-	db := new(m.DBConn)
-	db.Connect(dbAddress, dbName)
+	db := m.DBConn{}
+	db.Connect(dbAddress)
 	defer db.CloseSession()
 
-	node := m.NewNode(db)
+	node := m.NewNode(&db)
 
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
@@ -41,13 +43,10 @@ func main() {
 	}()
 
 	log.Println("Agent ready")
-	ticker5s := time.NewTicker(5 * time.Second)
-	ticker5m := time.NewTicker(5 * time.Minute)
+	ticker := time.NewTicker(5 * time.Second)
 	for {
 		select {
-		case <-ticker5s.C:
-			db.Insert(m.DBLogTable, node.NewLog())
-		case <-ticker5m.C:
+		case <-ticker.C:
 			node.Update()
 			db.Update(m.DBNodesTable, node.ID, node)
 		}

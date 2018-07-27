@@ -9,13 +9,9 @@ import (
 const (
 	// DBDefaultName defines the default database name
 	DBDefaultName string = "hydra_cluster_monitor"
-	// DBLogTable defines the database table with the nodes logs
-	DBLogTable string = "logs"
 	// DBNodesTable defines the database table with the nodes
 	DBNodesTable string = "nodes"
 )
-
-var databaseName string
 
 // DBConn struct to define the connection to the RethinkDB
 type DBConn struct {
@@ -23,22 +19,21 @@ type DBConn struct {
 }
 
 // Connect to the RethinkDB instance
-func (db *DBConn) Connect(addr, database string) {
+func (db *DBConn) Connect(addr string) {
 	session, err := r.Connect(r.ConnectOpts{
 		Address:  addr,
-		Database: database,
+		Database: DBDefaultName,
 	})
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
-	databaseName = database
 	db.session = session
-	log.Printf("Connected to %s | DB Name: %s", addr, database)
+	log.Printf("Connected to %s | DB Name: %s", addr, DBDefaultName)
 }
 
 // Insert a record to the database in the defined table
 func (db *DBConn) Insert(tableName string, record interface{}) {
-	_, err := r.DB(databaseName).Table(tableName).Insert(record).RunWrite(db.session)
+	_, err := r.DB(DBDefaultName).Table(tableName).Insert(record).RunWrite(db.session)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
@@ -46,7 +41,7 @@ func (db *DBConn) Insert(tableName string, record interface{}) {
 
 // Update a record to the database in the defined table
 func (db *DBConn) Update(tableName, id string, record interface{}) {
-	_, err := r.DB(databaseName).Table(tableName).Get(id).Update(record).RunWrite(db.session)
+	_, err := r.DB(DBDefaultName).Table(tableName).Get(id).Update(record).RunWrite(db.session)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
@@ -54,7 +49,7 @@ func (db *DBConn) Update(tableName, id string, record interface{}) {
 
 // LoadNode returns a node registered from the database
 func (db *DBConn) LoadNode(nodeRef *Node) {
-	query := r.DB(databaseName).Table(DBNodesTable).Filter(r.Row.Field("hostname").Eq(nodeRef.Hostname))
+	query := r.DB(DBDefaultName).Table(DBNodesTable).Filter(r.Row.Field("hostname").Eq(nodeRef.Hostname))
 	res, err := query.Run(db.session)
 	defer res.Close()
 	if err != nil {
@@ -71,24 +66,12 @@ func (db *DBConn) LoadNode(nodeRef *Node) {
 
 // Init creates the database and the initial tables
 func (db *DBConn) Init() {
-	err := r.DBCreate(databaseName).Exec(db.session)
+	err := r.DBCreate(DBDefaultName).Exec(db.session)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
-	rDB := r.DB(databaseName)
-	err = rDB.TableCreate(DBLogTable).Exec(db.session)
-	if err != nil {
-		log.Fatalln(err.Error())
-	}
-	err = rDB.Table(DBLogTable).IndexCreate("hostname").Exec(db.session)
-	if err != nil {
-		log.Fatalln(err.Error())
-	}
+	rDB := r.DB(DBDefaultName)
 	err = rDB.TableCreate(DBNodesTable).Exec(db.session)
-	if err != nil {
-		log.Fatalln(err.Error())
-	}
-	err = rDB.Table(DBNodesTable).IndexCreate("hostname").Exec(db.session)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}

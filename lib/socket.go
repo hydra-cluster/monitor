@@ -93,16 +93,16 @@ func wsHandler(hub *Hub, w http.ResponseWriter, r *http.Request) {
 }
 
 // StartWebsocketServer start listening for websocket messages
-func StartWebsocketServer(db *DBConn) {
+func StartWebsocketServer(db *DBConn, port string) {
 	hub := newHub()
 	go hub.run()
 
-	go db.OnChange(DBLogTable, hub)
+	go db.OnChange(DBNodesTable, hub)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		wsHandler(hub, w, r)
 	})
-	log.Println("Serving websocket at port 5000")
-	log.Fatal(http.ListenAndServe(":5000", mux))
+	log.Println("Serving websocket at port " + port)
+	log.Fatal(http.ListenAndServe(":"+port, mux))
 }

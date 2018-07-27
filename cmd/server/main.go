@@ -11,12 +11,14 @@ import (
 	m "github.com/hydra-cluster/monitor/lib"
 )
 
-var dbAddress, dbName string
+var (
+	dbInit    bool
+	dbAddress string
+)
 
 func main() {
-	var initDB = flag.Bool("dbinit", false, "Create the initial configurations for the database")
-	flag.StringVar(&dbAddress, "dburl", "localhost:28015", "Database address URL")
-	flag.StringVar(&dbName, "dbname", m.DBDefaultName, "Database name")
+	flag.BoolVar(&dbInit, "init", false, "Create the initial configurations for the database")
+	flag.StringVar(&dbAddress, "url", "localhost:28015", "Database address URL")
 
 	flag.Parse()
 
@@ -25,15 +27,15 @@ func main() {
 	fmt.Println("-------------------------------------")
 
 	db := new(m.DBConn)
-	db.Connect(dbAddress, dbName)
+	db.Connect(dbAddress)
 	defer db.CloseSession()
 
-	if *initDB {
+	if dbInit {
 		db.Init()
 		return
 	}
 
-	go m.StartWebsocketServer(db)
+	go m.StartWebsocketServer(db, "5000")
 
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
