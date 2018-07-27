@@ -7,19 +7,22 @@ import (
 	"os/exec"
 	"runtime"
 	"strconv"
+	"strings"
 	"time"
 )
 
 // Log represents attributes for each one of servers monitored params
 type Log struct {
-	ID          string    `gorethink:"id,omitempty"`
-	NodeID      string    `gorethink:"node_id"`
-	Hostname    string    `gorethink:"hostname"`
-	CPUUsage    float64   `gorethink:"cpu_usage"`
-	CPUTemp     float64   `gorethink:"cpu_temp"`
-	RAMUsage    float64   `gorethink:"ram_usage"`
-	HDDCapacity float64   `gorethink:"hdd_capacity"`
-	CreatedDate time.Time `gorethink:"created_at"`
+	ID           string    `gorethink:"id,omitempty"`
+	NodeID       string    `gorethink:"node_id"`
+	Hostname     string    `gorethink:"hostname"`
+	CPUUsage     float64   `gorethink:"cpu_usage"`
+	CPUTemp      float64   `gorethink:"cpu_temp"`
+	RAMUsage     float64   `gorethink:"ram_usage"`
+	SWAPUsage    float64   `gorethink:"swap_usage"`
+	HDDUsage     float64   `gorethink:"hdd_usage"`
+	StorageUsage float64   `gorethink:"storage_usage"`
+	CreatedDate  time.Time `gorethink:"created_at"`
 }
 
 //Node represents one of the Cluster node
@@ -27,6 +30,8 @@ type Node struct {
 	ID                 string             `gorethink:"id,omitempty"`
 	Hostname           string             `gorethink:"hostname"`
 	Distro             string             `gorethink:"distro"`
+	Kernel             string             `gorethink:"kernel"`
+	Model              string             `gorethink:"model"`
 	IP                 string             `gorethink:"ip"`
 	RegisterDate       time.Time          `gorethink:"registered_at"`
 	LastConnectionDate time.Time          `gorethink:"last_conn_at"`
@@ -44,7 +49,9 @@ type NetworkInterface struct {
 //Update reload node attributes
 func (n *Node) Update() {
 	n.Hostname, _ = os.Hostname()
-	n.Distro = getServerInfo("uname -a")
+	n.Model = getServerInfo("dmesg | grep Machine | cut -d ':' -f 4")
+	n.Distro = getServerInfo("cat /etc/os-release | head -1 | cut -d '\"' -f 2")
+	n.Kernel = getServerInfo("uname -a")
 	n.IP = getOutboundIP().To4().String()
 	n.UpdatedDate = time.Now()
 	getInterfaces(&n.NetworkInterfaces)
@@ -53,13 +60,15 @@ func (n *Node) Update() {
 // NewLog returns a instance of Log struct with attributes updated
 func (n *Node) NewLog() *Log {
 	return &Log{
-		NodeID:      n.ID,
-		Hostname:    n.Hostname,
-		CPUUsage:    stringToFloat64(getServerInfo("top -bn1 | grep load | awk '{printf \"%.2f\", $(NF-2)}'")),
-		CPUTemp:     stringToFloat64(getServerInfo("vcgencmd measure_temp | cut -d '=' -f 2 | head --bytes -1")),
-		RAMUsage:    stringToFloat64(getServerInfo("free -m | awk 'NR==2{printf \"MEM: %.2f%%\", $3*100/$2 }'")),
-		HDDCapacity: stringToFloat64(getServerInfo("df -h | awk '$NF==\"/\"{printf \"%s\", $5}'")),
-		CreatedDate: time.Now(),
+		NodeID:       n.ID,
+		Hostname:     n.Hostname,
+		CPUUsage:     stringToFloat64(getServerInfo("top -bn1 | grep load | awk '{printf \"%.2f\", $(NF-2)}'")),
+		CPUTemp:      stringToFloat64(getServerInfo("vcgencmd measure_temp | cut -d '=' -f 2 | head --bytes -3")),
+		RAMUsage:     stringToFloat64(getServerInfo("free -m | awk 'NR==2{printf \"%.2f\", $3*100/$2 }'")),
+		SWAPUsage:    stringToFloat64(getServerInfo("free -m | awk 'NR==3{printf \"%.2f\", $3*100/$2 }'")),
+		HDDUsage:     stringToFloat64(getServerInfo("df -h | awk '$NF==\"/\"{printf \"%s\", $5}' | head --bytes -1")),
+		StorageUsage: stringToFloat64(getServerInfo("df -h | awk '$NF==\"/hydra/storage\"{printf \"%s\", $5}' | head --bytes -1")),
+		CreatedDate:  time.Now(),
 	}
 }
 
@@ -87,7 +96,7 @@ func getServerInfo(cmd string) string {
 		return "undefined"
 	}
 	out, _ := exec.Command(cmd).Output()
-	return string(out)
+	return strings.Trim(string(out), " ")
 }
 
 func stringToFloat64(s string) float64 {
