@@ -12,11 +12,13 @@ import (
 	m "github.com/hydra-cluster/monitor/lib"
 )
 
-var dbAddress, libFolder string
+var (
+	dbAddress string
+	libFolder = "../../lib/"
+)
 
 func main() {
 	flag.StringVar(&dbAddress, "url", "localhost:28015", "Database address URL")
-	flag.StringVar(&libFolder, "lib", "/$GOPATH/bin/", "Path to the execCommand.py folder")
 
 	flag.Parse()
 

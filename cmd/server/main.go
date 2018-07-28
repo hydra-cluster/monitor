@@ -14,6 +14,7 @@ import (
 var (
 	dbInit    bool
 	dbAddress string
+	libFolder = "../../lib/"
 )
 
 func main() {
