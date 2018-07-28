@@ -21,7 +21,7 @@ start() {
 	echo -n "Starting $APP_NAME: "
  
 	if [ $STATUS -ne 0 ]; then
-		nohup $APP_PATH/$APP_FILENAME &gt; $APP_PATH/$APP_FILENAME.out 2&gt; $APP_PATH/$APP_FILENAME.err &lt; /dev/null &amp; 		echo $! &gt; $APP_PID
+		nohup $APP_PATH/$APP_FILENAME > $APP_PATH/$APP_FILENAME.out 2> $APP_PATH/$APP_FILENAME.err < /dev/null & 		echo $! > $APP_PID
 		echo -e $SUCCESS
 	else
 		echo -e $FAILURE
@@ -48,7 +48,7 @@ checkpid() {
     local STATUS=9
  
     if [ -f $APP_PID ]; then
-		ps -Fp `cat $APP_PID` | grep $APP_FILENAME &gt; $TMP_FILE
+		ps -Fp `cat $APP_PID` | grep $APP_FILENAME > $TMP_FILE
 		if [ -f $TMP_FILE -a -s $TMP_FILE ]; then
 			STATUS=0
 		else
