@@ -15,13 +15,13 @@ class Node:
 n = Node()
 
 if platform.system() == "Linux":
-    cmd = "uname -a"
+    cmd = "uname -a | head -1"
     n.kernel = subprocess.check_output(cmd, shell = True )
 
-    cmd = "cat /etc/os-release | head -1 | cut -d '\"' -f 2"
+    cmd = "cat /etc/os-release | head -1 | cut -d '\"' -f 2 | head -1"
     n.distro = subprocess.check_output(cmd, shell = True )
 
-    cmd = "dmesg | grep Machine | cut -d ':' -f 4"
+    cmd = "dmesg | grep Machine | cut -d ':' -f 4 | head -1"
     n.model = subprocess.check_output(cmd, shell = True )
 
     cmd = "top -bn1 | grep load | awk '{printf \"%.2f\", $(NF-2)}'"
