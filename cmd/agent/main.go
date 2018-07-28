@@ -24,9 +24,6 @@ func main() {
 	fmt.Println(" Hydra Cluster Monitor - Agent - v1.0 ")
 	fmt.Println("--------------------------------------")
 
-	pwd, _ := os.Getwd()
-	fmt.Println(pwd)
-
 	db := m.DBConn{}
 	db.Connect(dbAddress)
 	defer db.CloseSession()
