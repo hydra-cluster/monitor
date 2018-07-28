@@ -13,12 +13,14 @@ import (
 )
 
 var (
-	dbAddress string
-	libFolder = "../../lib/"
+	dbAddress      string
+	unregisterNode bool
+	libFolder      = "../../lib/"
 )
 
 func main() {
 	flag.StringVar(&dbAddress, "url", "localhost:28015", "Database address URL")
+	flag.BoolVar(&unregisterNode, "unregister", false, "Unregister this node from the database")
 
 	flag.Parse()
 
@@ -33,6 +35,11 @@ func main() {
 	m.ExecCommandFolder = libFolder
 
 	node := m.NewNode(&db)
+
+	if unregisterNode {
+		db.DeleteNode(node.Hostname)
+		return
+	}
 
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)

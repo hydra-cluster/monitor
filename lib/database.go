@@ -47,6 +47,23 @@ func (db *DBConn) Update(tableName, id string, record interface{}) {
 	}
 }
 
+// DeleteNode unregster a node in the database
+func (db *DBConn) DeleteNode(hostname string) {
+	table := r.DB(DBDefaultName).Table(DBNodesTable)
+	rows, err := table.GetAllByIndex("hostname", hostname).Run(db.session)
+	if rows.IsNil() {
+		log.Printf("Node %s not registered", hostname)
+		return
+	}
+	n := Node{}
+	rows.One(&n)
+	err = table.Get(n.ID).Delete().Exec(db.session)
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+	log.Printf("Node %s uregistered", hostname)
+}
+
 // LoadNode returns a node registered from the database
 func (db *DBConn) LoadNode(nodeRef *Node) {
 	query := r.DB(DBDefaultName).Table(DBNodesTable).Filter(r.Row.Field("hostname").Eq(nodeRef.Hostname))
@@ -75,7 +92,11 @@ func (db *DBConn) Init() {
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
-	log.Println("Database created")
+	err = rDB.Table(DBNodesTable).IndexCreate("hostname").Exec(db.session)
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+	log.Println("Database initialized")
 }
 
 // CloseSession close the current session with the database
