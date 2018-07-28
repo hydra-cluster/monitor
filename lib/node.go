@@ -4,10 +4,6 @@ import (
 	"log"
 	"net"
 	"os"
-	"os/exec"
-	"runtime"
-	"strconv"
-	"strings"
 	"time"
 )
 
@@ -45,10 +41,11 @@ type NetworkInterface struct {
 
 //Update reload node attributes
 func (n *Node) Update() {
+	loadParam()
 	n.Hostname, _ = os.Hostname()
-	n.Model = getServerInfo("dmesg | grep Machine | cut -d ':' -f 4")
-	n.Distro = getServerInfo("cat /etc/os-release | head -1 | cut -d '\"' -f 2")
-	n.Kernel = getServerInfo("uname -a")
+	n.Model = getParam(paramModel)
+	n.Distro = getParam(paramDistro)
+	n.Kernel = getParam(paramKernel)
 	n.IP = getOutboundIP().To4().String()
 	n.LastUpdatedDate = time.Now()
 	updateNodeParams(n)
@@ -57,12 +54,12 @@ func (n *Node) Update() {
 
 // NewLog returns a instance of Log struct with attributes updated
 func updateNodeParams(n *Node) {
-	n.Params.CPUUsage = stringToFloat64(getServerInfo("top -bn1 | grep load | awk '{printf \"%.2f\", $(NF-2)}'"))
-	n.Params.CPUTemp = stringToFloat64(getServerInfo("vcgencmd measure_temp | cut -d '=' -f 2 | head --bytes -3"))
-	n.Params.RAMUsage = stringToFloat64(getServerInfo("free -m | awk 'NR==2{printf \"%.2f\", $3*100/$2 }'"))
-	n.Params.SWAPUsage = stringToFloat64(getServerInfo("free -m | awk 'NR==3{printf \"%.2f\", $3*100/$2 }'"))
-	n.Params.HDDUsage = stringToFloat64(getServerInfo("df -h | awk '$NF==\"/\"{printf \"%s\", $5}' | head --bytes -1"))
-	n.Params.StorageUsage = stringToFloat64(getServerInfo("df -h | awk '$NF==\"/hydra/storage\"{printf \"%s\", $5}' | head --bytes -1"))
+	n.Params.CPUUsage = getFloatParam(paramCPUUsage)
+	n.Params.CPUTemp = getFloatParam(paramCPUTemp)
+	n.Params.RAMUsage = getFloatParam(paramRAMUsage)
+	n.Params.SWAPUsage = getFloatParam(paramSwapUsage)
+	n.Params.HDDUsage = getFloatParam(paramHDDUsage)
+	n.Params.StorageUsage = getFloatParam(paramStorageUsage)
 }
 
 // NewNode load node from db or create if it does not exists
@@ -82,22 +79,6 @@ func NewNode(db *DBConn) *Node {
 		db.Update(DBNodesTable, n.ID, n)
 	}
 	return &n
-}
-
-func getServerInfo(cmd string) string {
-	if runtime.GOOS != "linux" {
-		return "undefined"
-	}
-	out, _ := exec.Command(cmd).Output()
-	return strings.Trim(string(out), " ")
-}
-
-func stringToFloat64(s string) float64 {
-	if s == "undefined" {
-		return 0
-	}
-	res, _ := strconv.ParseFloat(s, 64)
-	return res
 }
 
 func getOutboundIP() net.IP {
