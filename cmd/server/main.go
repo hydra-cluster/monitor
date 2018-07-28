@@ -22,9 +22,9 @@ func main() {
 
 	flag.Parse()
 
-	fmt.Println("-------------------------------------")
-	fmt.Println("Hydra Cluster Monitor - Server - v1.0")
-	fmt.Println("-------------------------------------")
+	fmt.Println("---------------------------------------")
+	fmt.Println(" Hydra Cluster Monitor - Server - v1.0 ")
+	fmt.Println("---------------------------------------")
 
 	db := new(m.DBConn)
 	db.Connect(dbAddress)

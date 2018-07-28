@@ -3,6 +3,7 @@ package lib
 import (
 	"encoding/json"
 	"log"
+	"os"
 	"os/exec"
 	"strconv"
 )
@@ -24,7 +25,12 @@ var ExecCommandFolder string
 var params map[string]interface{}
 
 func loadParam() {
-	out, _ := exec.Command("python", ExecCommandFolder+"execCommand.py").Output()
+	folder := ExecCommandFolder
+	if folder == "" {
+		pwd, _ := os.Getwd()
+		folder = pwd + "/../../lib/"
+	}
+	out, _ := exec.Command("python", folder+"execCommand.py").Output()
 	var p interface{}
 	json.Unmarshal(out, &p)
 	if p == nil {

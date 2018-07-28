@@ -16,13 +16,16 @@ var dbAddress, libFolder string
 
 func main() {
 	flag.StringVar(&dbAddress, "url", "localhost:28015", "Database address URL")
-	flag.StringVar(&libFolder, "lib", "../../lib/", "Path to the execCommand.py folder")
+	flag.StringVar(&libFolder, "lib", "", "Path to the execCommand.py folder")
 
 	flag.Parse()
 
-	fmt.Println("------------------------------------")
-	fmt.Println("Hydra Cluster Monitor - Agent - v1.0")
-	fmt.Println("------------------------------------")
+	fmt.Println("--------------------------------------")
+	fmt.Println(" Hydra Cluster Monitor - Agent - v1.0 ")
+	fmt.Println("--------------------------------------")
+
+	pwd, _ := os.Getwd()
+	fmt.Println(pwd)
 
 	db := m.DBConn{}
 	db.Connect(dbAddress)
