@@ -6,6 +6,10 @@ rm $GOPATH/bin/execCommand.py
 cd $GOPATH/src/github.com/hydra-cluster/monitor/lib
 cp -n execCommand.py $GOPATH/bin/
 
+echo "   Downloading go dependencies..."
+
+go get -v -t -d ./...
+
 echo "   Building Monitor Agent..."
 
 #build and install server and agent executables
