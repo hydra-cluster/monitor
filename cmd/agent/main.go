@@ -16,7 +16,7 @@ var dbAddress, libFolder string
 
 func main() {
 	flag.StringVar(&dbAddress, "url", "localhost:28015", "Database address URL")
-	flag.StringVar(&libFolder, "lib", "", "Path to the execCommand.py folder")
+	flag.StringVar(&libFolder, "lib", "/$GOPATH/bin/", "Path to the execCommand.py folder")
 
 	flag.Parse()
 
