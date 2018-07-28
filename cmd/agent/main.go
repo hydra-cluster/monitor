@@ -12,10 +12,11 @@ import (
 	m "github.com/hydra-cluster/monitor/lib"
 )
 
-var dbAddress string
+var dbAddress, libFolder string
 
 func main() {
 	flag.StringVar(&dbAddress, "url", "localhost:28015", "Database address URL")
+	flag.StringVar(&libFolder, "lib", "../../lib/", "Path to the execCommand.py folder")
 
 	flag.Parse()
 
@@ -26,6 +27,8 @@ func main() {
 	db := m.DBConn{}
 	db.Connect(dbAddress)
 	defer db.CloseSession()
+
+	m.ExecCommandFolder = libFolder
 
 	node := m.NewNode(&db)
 

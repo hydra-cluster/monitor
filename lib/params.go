@@ -19,12 +19,17 @@ const (
 	paramStorageUsage = "storage_usage"
 )
 
+// ExecCommandFolder defines the system path to the lib in python to execute commands
+var ExecCommandFolder string
 var params map[string]interface{}
 
 func loadParam() {
-	out, _ := exec.Command("python", "execCommand.py").Output()
+	out, _ := exec.Command("python", ExecCommandFolder+"execCommand.py").Output()
 	var p interface{}
 	json.Unmarshal(out, &p)
+	if p == nil {
+		log.Fatalln("lib execCommand.py not found")
+	}
 	params = p.(map[string]interface{})
 }
 

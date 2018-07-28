@@ -14,7 +14,7 @@ class Node:
 
 n = Node()
 
-if platform.system() == "linux":
+if platform.system() == "Linux":
     cmd = "uname -a"
     n.kernel = subprocess.check_output(cmd, shell = True )
 
@@ -41,6 +41,5 @@ if platform.system() == "linux":
 
     cmd = "df -h | awk '$NF==\"/hydra/storage\"{printf \"%s\", $5}' | head --bytes -1"
     n.storage_usage = subprocess.check_output(cmd, shell = True )
-
 
 print(json.dumps(n.__dict__))
