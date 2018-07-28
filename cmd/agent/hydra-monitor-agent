@@ -1,53 +1,93 @@
-#!/bin/sh
-
-### BEGIN INIT INFO
-# Provides:          myservice
-# Required-Start:    $remote_fs $syslog
-# Required-Stop:     $remote_fs $syslog
-# Default-Start:     2 3 4 5
-# Default-Stop:      0 1 6
-# Short-Description: Put a short description of the service here
-# Description:       Put a long description of the service here
-### END INIT INFO
-
-# Change the next 3 lines to suit where you install your script and what you want to call it
-DIR=/$GOPATH/bin
-DAEMON=$DIR/monitor-agent
-DAEMON_NAME=monitor-agent
-
-# Add any command line options for your daemon here
-DAEMON_OPTS=""
-
-# This next line determines what user the script runs as.
-# Root generally not recommended but necessary if you are using the Raspberry Pi GPIO from Python.
-DAEMON_USER=root
-
-# The process ID of the script when it runs is stored here:
-PIDFILE=$DIR/$DAEMON_NAME.pid
-
-. /lib/lsb/init-functions
-
-do_start () {
-    log_daemon_msg "Starting system $DAEMON_NAME daemon"
-    start-stop-daemon --start --background --pidfile $PIDFILE --make-pidfile --user $DAEMON_USER --chuid $DAEMON_USER --startas $DAEMON -- $DAEMON_OPTS
-    log_end_msg $?
+#!/bin/bash
+ 
+APP_NAME="hydra-monitor-agent"
+APP_FILENAME="monitor-agent"
+APP_PID="/$GOPATH/bin/$APP_FILENAME.pid"
+APP_PATH="/$GOPATH/bin/$APP_FILENAME"
+ 
+TMP_FILE="/tmp/status_$APP_FILENAME"
+ 
+SUCCESS="[\\033[1;32mSuccess\\033[0m]"
+FAILURE="[\\033[1;31mFailure\\033[0;39m]"
+ 
+S_STATUS[0]="\\033[1;32mRunning\\033[0m"
+S_STATUS[1]="\\033[1;31mNot Running\\033[0m"
+S_STATUS[2]="\\033[1;31mStopped incorrectly\\033[0m"
+S_STATUS[9]="\\033[1;31mUnknown\\033[0m"
+ 
+start() {
+	checkpid
+	STATUS=$?
+	echo -n "Starting $APP_NAME: "
+ 
+	if [ $STATUS -ne 0 ]; then
+		nohup $APP_PATH/$APP_FILENAME &gt; $APP_PATH/$APP_FILENAME.out 2&gt; $APP_PATH/$APP_FILENAME.err &lt; /dev/null &amp; 		echo $! &gt; $APP_PID
+		echo -e $SUCCESS
+	else
+		echo -e $FAILURE
+		echo "Check status for details."
+	fi
 }
-do_stop () {
-    log_daemon_msg "Stopping system $DAEMON_NAME daemon"
-    start-stop-daemon --stop --pidfile $PIDFILE --retry 10
-    log_end_msg $?
+ 
+stop() {
+	checkpid
+	local STATUS=$?
+	echo -n "Stopping $APP_NAME: "
+ 
+	if [ $STATUS -eq 0 ]; then
+		kill `cat $APP_PID`
+		rm $APP_PID
+		echo -e $SUCCESS
+	else
+		echo -e $FAILURE
+		echo "Check status for details."
+	fi
 }
-
+ 
+checkpid() {
+    local STATUS=9
+ 
+    if [ -f $APP_PID ]; then
+		ps -Fp `cat $APP_PID` | grep $APP_FILENAME &gt; $TMP_FILE
+		if [ -f $TMP_FILE -a -s $TMP_FILE ]; then
+			STATUS=0
+		else
+			STATUS=2
+		fi
+		rm -f $TMP_FILE
+	else
+		STATUS=1
+	fi
+ 
+	return $STATUS
+}
+ 
+checkstatus() {
+	checkpid
+	local CODE=$?
+ 
+	echo -n "$APP_NAME Status: "
+	echo -e ${S_STATUS[CODE]}
+}
+ 
 case "$1" in
-
-    start|stop)
-        do_${1}
-        ;;
-
-    restart|reload|force-reload)
-        do_stop
-        do_start
-        ;;
-
-    status)
-        status_of_proc "$DAEMON_NAME" "$DAEMON" && exit 0 || exit $?
+	'start')
+		start
+		;;
+	'stop')
+		stop
+		;;
+	'restart')
+		stop
+		start
+		;;
+	'status')
+		checkstatus
+		;;
+	*)
+		echo "Usage: $0 { start | stop | restart | status }"
+		exit 1
+		;;
+esac
+ 
+exit 0
