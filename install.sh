@@ -32,7 +32,7 @@ agent() {
     sudo cp -n hydra-monitor-agent /etc/init.d
     sudo chmod +x /etc/init.d/hydra-monitor-agent
 
-    sudo update-rc.d hydra-moitor-agent defaults 
+    sudo update-rc.d hydra-monitor-agent defaults 
 }
 
 server() {

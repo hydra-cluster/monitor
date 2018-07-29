@@ -40,7 +40,7 @@ func (db *DBConn) Connect(addr string) {
 			break
 		}
 	}
-	log.Printf("Connected to %s | DB Name: %s", addr, DBDefaultName)
+	log.Println("Connected to DB")
 }
 
 // Insert a record to the database in the defined table
