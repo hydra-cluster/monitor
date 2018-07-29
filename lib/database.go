@@ -2,6 +2,7 @@ package lib
 
 import (
 	"log"
+	"time"
 
 	r "gopkg.in/gorethink/gorethink.v4"
 )
@@ -20,14 +21,25 @@ type DBConn struct {
 
 // Connect to the RethinkDB instance
 func (db *DBConn) Connect(addr string) {
-	session, err := r.Connect(r.ConnectOpts{
-		Address:  addr,
-		Database: DBDefaultName,
-	})
-	if err != nil {
-		log.Fatalln(err.Error())
+	log.Printf("Connecting to %s | DB Name: %s", addr, DBDefaultName)
+	attemps := 0
+	for {
+		session, err := r.Connect(r.ConnectOpts{
+			Address:  addr,
+			Database: DBDefaultName,
+		})
+		if err != nil {
+			attemps++
+			time.Sleep(5 * time.Second)
+			if attemps > 10 {
+				log.Fatalln(err.Error())
+			}
+			log.Printf("Retrying to connect to DB [%02d]", attemps)
+		} else {
+			db.session = session
+			break
+		}
 	}
-	db.session = session
 	log.Printf("Connected to %s | DB Name: %s", addr, DBDefaultName)
 }
 
