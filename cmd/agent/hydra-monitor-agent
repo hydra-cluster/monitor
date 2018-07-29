@@ -1,5 +1,14 @@
 #!/bin/bash
  
+### BEGIN INIT INFO
+# Provides:          hydra-monitor-agent
+# Required-Start:    $all
+# Required-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:
+# Short-Description: starts the hydra monitor agent
+### END INIT INFO
+
 APP_NAME="hydra-monitor-agent"
 APP_FILENAME="monitor-agent"
 APP_PATH="/usr/local/bin"

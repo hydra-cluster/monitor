@@ -1,5 +1,14 @@
 #!/bin/bash
  
+### BEGIN INIT INFO
+# Provides:          hydra-monitor-server
+# Required-Start:    $all
+# Required-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:
+# Short-Description: starts the hydra monitor server
+### END INIT INFO
+
 APP_NAME="hydra-monitor-server"
 APP_FILENAME="monitor-server"
 APP_PATH="/usr/local/bin"
