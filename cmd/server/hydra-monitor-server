@@ -2,7 +2,7 @@
  
 APP_NAME="hydra-monitor-server"
 APP_FILENAME="monitor-server"
-APP_PATH="/$GOPATH/bin"
+APP_PATH="/usr/local/bin"
 APP_PID="/$APP_PATH/$APP_FILENAME.pid"
  
 TMP_FILE="/tmp/status_$APP_FILENAME"
@@ -21,7 +21,7 @@ start() {
 	echo -n "Starting $APP_NAME: "
  
 	if [ $STATUS -ne 0 ]; then
-		nohup $APP_PATH/$APP_FILENAME > $APP_PATH/$APP_FILENAME.out 2> $APP_PATH/$APP_FILENAME.err < /dev/null & 		echo $! > $APP_PID
+		nohup $APP_PATH/$APP_FILENAME > $APP_PATH/$APP_FILENAME.out 2>&1 < /dev/null & 		echo $! > $APP_PID
 		echo -e $SUCCESS
 	else
 		echo -e $FAILURE
