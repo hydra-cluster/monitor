@@ -12,7 +12,8 @@
 APP_NAME="hydra-monitor-agent"
 APP_FILENAME="monitor-agent"
 APP_PATH="/usr/local/bin"
-APP_PID="$APP_PATH/$APP_FILENAME.pid"
+APP_PID="/var/log/hydra/$APP_NAME.pid"
+APP_LOG_PATH="/var/log/hydra"
  
 TMP_FILE="/tmp/status_$APP_FILENAME"
  
@@ -30,7 +31,7 @@ start() {
 	echo -n "Starting $APP_NAME: "
  
 	if [ $STATUS -ne 0 ]; then
-		nohup $APP_PATH/$APP_FILENAME > $APP_PATH/$APP_FILENAME.out 2>&1 < /dev/null & 		echo $! > $APP_PID
+		nohup $APP_PATH/$APP_FILENAME -url "10.0.0.1:28015" > $APP_LOG_PATH/$APP_NAME.log 2>&1 < /dev/null & 		echo $! > $APP_PID
 		echo -e $SUCCESS
 	else
 		echo -e $FAILURE
