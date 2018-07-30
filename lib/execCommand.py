@@ -15,7 +15,7 @@ class Node:
 n = Node()
 
 if platform.system() == "Linux":
-    cmd = "uname -a | head --bytes -1"
+    cmd = "uname -r | head --bytes -1"
     n.kernel = subprocess.check_output(cmd, shell = True )
 
     cmd = "cat /etc/os-release | head -1 | cut -d '\"' -f 2 | head --bytes -1"
