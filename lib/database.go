@@ -36,8 +36,19 @@ func (db *DBConn) Connect(addr string) {
 			}
 			log.Printf("Retrying to connect to DB [%02d]", attemps)
 		} else {
-			db.session = session
-			break
+			_, err := r.DB(DBDefaultName).Table(DBNodesTable).Run(session)
+			if err != nil {
+				attemps++
+				session.Close()
+				time.Sleep(5 * time.Second)
+				if attemps > 20 {
+					log.Fatalln(err.Error())
+				}
+				log.Printf("Retrying to connect to DB [%02d]", attemps)
+			} else {
+				db.session = session
+				break
+			}
 		}
 	}
 	log.Println("Connected to DB")
