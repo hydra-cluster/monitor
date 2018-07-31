@@ -1,9 +1,11 @@
 package lib
 
 import (
+	"encoding/json"
 	"log"
 	"net"
 	"os"
+	"os/exec"
 	"time"
 )
 
@@ -15,21 +17,18 @@ type Node struct {
 	Kernel             string             `gorethink:"kernel"`
 	Model              string             `gorethink:"model"`
 	IP                 string             `gorethink:"ip"`
-	Params             Params             `gorethink:"params"`
+	Params             []Param            `gorethink:"params"`
 	RegisterDate       time.Time          `gorethink:"registered_at"`
 	LastConnectionDate time.Time          `gorethink:"last_connection_at"`
 	LastUpdatedDate    time.Time          `gorethink:"last_updated_at"`
 	NetworkInterfaces  []NetworkInterface `gorethink:"network_interfaces"`
 }
 
-// Params represents attributes for each one of servers monitored params
-type Params struct {
-	CPUUsage     float64 `gorethink:"cpu_usage"`
-	CPUTemp      float64 `gorethink:"cpu_temp"`
-	RAMUsage     float64 `gorethink:"ram_usage"`
-	SWAPUsage    float64 `gorethink:"swap_usage"`
-	HDDUsage     float64 `gorethink:"hdd_usage"`
-	StorageUsage float64 `gorethink:"storage_usage"`
+// Param represents a instance of servers monitored parameter
+type Param struct {
+	Label string `gorethink:"label"`
+	Value string `gorethink:"value"`
+	Unit  string `gorethink:"unit"`
 }
 
 // NetworkInterface represents server network card
@@ -41,25 +40,11 @@ type NetworkInterface struct {
 
 //Update reload node attributes
 func (n *Node) Update() {
-	loadParam()
+	loadServerParametes(n)
 	n.Hostname, _ = os.Hostname()
-	n.Model = getParam(paramModel)
-	n.Distro = getParam(paramDistro)
-	n.Kernel = getParam(paramKernel)
-	n.IP = getOutboundIP().To4().String()
 	n.LastUpdatedDate = time.Now()
-	updateNodeParams(n)
+	n.IP = getOutboundIP().To4().String()
 	getInterfaces(&n.NetworkInterfaces)
-}
-
-// NewLog returns a instance of Log struct with attributes updated
-func updateNodeParams(n *Node) {
-	n.Params.CPUUsage = getFloatParam(paramCPUUsage)
-	n.Params.CPUTemp = getFloatParam(paramCPUTemp)
-	n.Params.RAMUsage = getFloatParam(paramRAMUsage)
-	n.Params.SWAPUsage = getFloatParam(paramSwapUsage)
-	n.Params.HDDUsage = getFloatParam(paramHDDUsage)
-	n.Params.StorageUsage = getFloatParam(paramStorageUsage)
 }
 
 // NewNode load node from db or create if it does not exists
@@ -112,4 +97,15 @@ func getInterfaces(nis *[]NetworkInterface) {
 			*nis = append(*nis, ni)
 		}
 	}
+}
+
+// ExecCommandFolder defines the system path to the lib in python to execute commands
+var ExecCommandFolder string
+
+func loadServerParametes(n *Node) {
+	out, err := exec.Command("python", ExecCommandFolder+"execCommand.py").Output()
+	if err != nil {
+		log.Fatalln("lib execCommand.py not found")
+	}
+	json.Unmarshal(out, n)
 }
