@@ -26,9 +26,11 @@ type Node struct {
 
 // Param represents a instance of servers monitored parameter
 type Param struct {
-	Label string `gorethink:"label"`
-	Value string `gorethink:"value"`
-	Unit  string `gorethink:"unit"`
+	Label   string `gorethink:"label"`
+	Value   string `gorethink:"value"`
+	Unit    string `gorethink:"unit"`
+	Warning string `gorethink:"warning_target"`
+	Danger  string `gorethink:"danger_target"`
 }
 
 // NetworkInterface represents server network card
