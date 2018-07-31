@@ -41,18 +41,18 @@ if platform.system() == "Linux":
 
     cmd = "free -m | awk 'NR==2{printf \"%.2f\", $3*100/$2 }'"
     value = subprocess.check_output(cmd, shell = True )
-    n.Params.append(Param(value, "RAM", "%", "0.7", "0.9" ))
+    n.Params.append(Param(value, "RAM", "%", "70", "85" ))
 
     cmd = "free -m | awk 'NR==3{printf \"%.2f\", $3*100/$2 }'"
     value = subprocess.check_output(cmd, shell = True )
-    n.Params.append(Param(value, "SWAP", "%", "0.5", "0.8" ))
+    n.Params.append(Param(value, "SWAP", "%", "50", "80" ))
     
     cmd = "df -h | awk '$NF==\"/\"{printf \"%s\", $5}' | head --bytes -1"
     value = subprocess.check_output(cmd, shell = True )
-    n.Params.append(Param(value, "HDD", "%", "0.7", "0.9" ))
+    n.Params.append(Param(value, "HDD", "%", "50", "85" ))
     
     cmd = "df -h | awk '$NF==\"/hydra/storage\"{printf \"%s\", $5}' | head --bytes -1"
     value = subprocess.check_output(cmd, shell = True )
-    n.Params.append(Param(value, "Storage", "%", "0.7", "0.9" ))
+    n.Params.append(Param(value, "Storage", "%", "50", "70" ))
 
 print(n.toJSON())
