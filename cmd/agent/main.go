@@ -51,6 +51,9 @@ func main() {
 		os.Exit(1)
 	}()
 
+	log.Println("Synchronizing Agent")
+	time.Sleep(time.Now().Truncate(5 * time.Second).Add(5 * time.Second).Sub(time.Now()))
+
 	log.Println("Agent ready")
 	ticker := time.NewTicker(5 * time.Second)
 	for {

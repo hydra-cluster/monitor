@@ -79,7 +79,7 @@ func (h *Hub) run() {
 	}
 }
 
-func wsHandler(hub *Hub, w http.ResponseWriter, r *http.Request) {
+func wsHandler(hub *Hub, db *DBConn, w http.ResponseWriter, r *http.Request) {
 	upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -90,6 +90,8 @@ func wsHandler(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	client.hub.register <- client
 
 	go client.run()
+
+	client.send <- db.GetAll(DBNodesTable)
 }
 
 // StartWebsocketServer start listening for websocket messages
@@ -101,7 +103,7 @@ func StartWebsocketServer(db *DBConn, port string) {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		wsHandler(hub, w, r)
+		wsHandler(hub, db, w, r)
 	})
 	log.Println("Serving websocket at port " + port)
 	log.Fatal(http.ListenAndServe(":"+port, mux))

@@ -54,6 +54,17 @@ func (db *DBConn) Connect(addr string) {
 	log.Println("Connected to DB")
 }
 
+// GetAll returns all records in the defined table
+func (db *DBConn) GetAll(tableName string) interface{} {
+	res, err := r.Table(tableName).Run(db.session)
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+	var rows []interface{}
+	res.All(&rows)
+	return rows
+}
+
 // Insert a record to the database in the defined table
 func (db *DBConn) Insert(tableName string, record interface{}) {
 	_, err := r.DB(DBDefaultName).Table(tableName).Insert(record).RunWrite(db.session)
