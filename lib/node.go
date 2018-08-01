@@ -122,7 +122,7 @@ func loadServerParametes(n *Node) {
 	}
 	json.Unmarshal(out, n)
 
-	for _, p := range n.Params {
-		p.pushToHistory(n.LastUpdatedDate)
+	for index := range n.Params {
+		n.Params[index].pushToHistory(n.LastUpdatedDate)
 	}
 }
