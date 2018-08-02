@@ -26,22 +26,11 @@ type Node struct {
 
 // Param represents a instance of servers monitored parameter
 type Param struct {
-	Label       string         `gorethink:"label"`
-	Value       string         `gorethink:"value"`
-	Unit        string         `gorethink:"unit"`
-	Warning     string         `gorethink:"warning_target"`
-	Danger      string         `gorethink:"danger_target"`
-	HistoryData []paramHistory `gorethink:"history_data"`
-}
-
-func (p *Param) pushToHistory(date time.Time) {
-	h := paramHistory{Value: p.Value, Date: date}
-	p.HistoryData = append(p.HistoryData, h)
-}
-
-type paramHistory struct {
-	Value string    `gorethink:"value"`
-	Date  time.Time `gorethink:"created_at"`
+	Label   string `gorethink:"label"`
+	Value   string `gorethink:"value"`
+	Unit    string `gorethink:"unit"`
+	Warning string `gorethink:"warning_target"`
+	Danger  string `gorethink:"danger_target"`
 }
 
 // NetworkInterface represents server network card
@@ -121,8 +110,4 @@ func loadServerParametes(n *Node) {
 		log.Fatalln("lib execCommand.py not found")
 	}
 	json.Unmarshal(out, n)
-
-	for index := range n.Params {
-		n.Params[index].pushToHistory(n.LastUpdatedDate)
-	}
 }
