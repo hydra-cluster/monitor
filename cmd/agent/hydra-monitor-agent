@@ -31,7 +31,7 @@ start() {
 	echo -n "Starting $APP_NAME: "
  
 	if [ $STATUS -ne 0 ]; then
-		nohup $APP_PATH/$APP_FILENAME -url "10.0.0.1:28015" > $APP_LOG_PATH/$APP_NAME.log 2>&1 < /dev/null & 		echo $! > $APP_PID
+		nohup $APP_PATH/$APP_FILENAME -addr "head01.hydra:5000" > $APP_LOG_PATH/$APP_NAME.log 2>&1 < /dev/null & 		echo $! > $APP_PID
 		echo -e $SUCCESS
 	else
 		echo -e $FAILURE
