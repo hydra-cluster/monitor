@@ -9,18 +9,16 @@ import (
 	"syscall"
 	"time"
 
-	m "github.com/hydra-cluster/monitor/lib"
+	monitor "github.com/hydra-cluster/monitor/lib"
+	"github.com/hydra-cluster/monitor/lib/ws"
 )
 
 var (
-	dbAddress      string
-	unregisterNode bool
-	libFolder      = "../../lib/"
+	libFolder = "../../lib/"
 )
 
 func main() {
-	flag.StringVar(&dbAddress, "url", "localhost:28015", "Database address URL")
-	flag.BoolVar(&unregisterNode, "unregister", false, "Unregister this node from the database")
+	var addr = flag.String("addr", "localhost:5000", "http service address")
 
 	flag.Parse()
 
@@ -28,39 +26,47 @@ func main() {
 	fmt.Println(" Hydra Cluster Monitor - Agent - v1.0 ")
 	fmt.Println("--------------------------------------")
 
-	db := m.DBConn{}
-	db.Connect(dbAddress)
-	defer db.CloseSession()
+	monitor.ExecCommandFolder = libFolder
 
-	m.ExecCommandFolder = libFolder
+	node := monitor.NewNode()
 
-	node := m.NewNode(&db)
+	url := "ws://" + *addr + "/ws?id=" + node.Hostname + "&mode=agent"
+	log.Printf("connecting to %s", url)
 
-	if unregisterNode {
-		db.DeleteNode(node.Hostname)
-		return
-	}
+	client := ws.Dial(url, node.Hostname, "agent", handlerReadMessage)
+	go client.Run()
+
+	log.Println("Synchronizing Agent")
+	time.Sleep(time.Now().Truncate(5 * time.Second).Add(5 * time.Second).Sub(time.Now()))
+
+	log.Println("Registering agent")
+	client.Emit(ws.NewMessage("server", node.Hostname, "agent-register", *node))
+
+	log.Println("Agent ready")
 
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
 		fmt.Println("")
-		db.CloseSession()
+		client.Close()
 		log.Println("Agent terminated")
 		os.Exit(1)
 	}()
 
-	log.Println("Synchronizing Agent")
-	time.Sleep(time.Now().Truncate(5 * time.Second).Add(5 * time.Second).Sub(time.Now()))
-
-	log.Println("Agent ready")
 	ticker := time.NewTicker(5 * time.Second)
 	for {
 		select {
 		case <-ticker.C:
 			node.Update()
-			db.Update(m.DBNodesTable, node.ID, node)
+			err := client.Emit(ws.NewMessage("broadcast", node.Hostname, "updated-agent", *node))
+			if err != nil {
+				return
+			}
 		}
 	}
+}
+
+func handlerReadMessage(hub *ws.Hub, msg *ws.Message) {
+
 }

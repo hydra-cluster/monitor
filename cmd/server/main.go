@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
@@ -8,20 +9,18 @@ import (
 	"os/signal"
 	"syscall"
 
-	m "github.com/hydra-cluster/monitor/lib"
+	"github.com/hydra-cluster/monitor/lib"
+	"github.com/hydra-cluster/monitor/lib/ws"
 )
 
 var (
-	dbInit         bool
-	dbAddress      string
-	unregisterNode string
-	libFolder      = "../../lib/"
+	wsPort          string
+	registeredNodes lib.Nodes
+	libFolder       = "../../lib/"
 )
 
 func main() {
-	flag.BoolVar(&dbInit, "init", false, "Create the initial configurations for the database")
-	flag.StringVar(&unregisterNode, "unregister", "", "Delete node from the database passing the hostname")
-	flag.StringVar(&dbAddress, "url", "localhost:28015", "Database address URL")
+	flag.StringVar(&wsPort, "port", "5000", "WebSocket listening port")
 
 	flag.Parse()
 
@@ -29,27 +28,32 @@ func main() {
 	fmt.Println(" Hydra Cluster Monitor - Server - v1.0 ")
 	fmt.Println("---------------------------------------")
 
-	db := new(m.DBConn)
-	db.Connect(dbAddress)
-	defer db.CloseSession()
+	registeredNodes = lib.Nodes{}
+	registeredNodes.Load()
 
-	if dbInit {
-		db.Init()
-		return
-	}
-
-	if unregisterNode != "" {
-		db.DeleteNode(unregisterNode)
-		return
-	}
-
-	go m.StartWebsocketServer(db, "5000")
+	go ws.StartWebsocketServer(wsPort, handlerReadMessage, &registeredNodes)
 
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	<-c
 	fmt.Println("")
-	db.CloseSession()
 	log.Println("Server terminated")
 	os.Exit(1)
+}
+
+func handlerReadMessage(hub *ws.Hub, msg *ws.Message) {
+	if msg.To == "server" {
+		node := lib.Node{}
+		jsonString, _ := json.Marshal(msg.Content)
+		json.Unmarshal(jsonString, &node)
+		switch msg.Action {
+		case "agent-register":
+			registeredNodes.Register(node)
+		case "agent-unregister":
+			registeredNodes.Unregister(node)
+		}
+		registeredNodes.Save()
+		return
+	}
+	hub.Emit(msg)
 }

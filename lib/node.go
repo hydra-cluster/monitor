@@ -2,6 +2,7 @@ package lib
 
 import (
 	"encoding/json"
+	"io/ioutil"
 	"log"
 	"net"
 	"os"
@@ -9,38 +10,69 @@ import (
 	"time"
 )
 
-//Node represents one of the Cluster node
+// Nodes represents a list of registered nodes
+type Nodes struct {
+	Registered []Node `json:"registered"`
+}
+
+// Register node on the registered agents array
+func (nodes *Nodes) Register(node Node) {
+	nodes.Unregister(node)
+	nodes.Registered = append(nodes.Registered, node)
+}
+
+// Unregister node on the registered agents array
+func (nodes *Nodes) Unregister(node Node) {
+	for index, n := range nodes.Registered {
+		if n.Hostname == node.Hostname {
+			nodes.Registered = append(nodes.Registered[:index], nodes.Registered[index+1:]...)
+		}
+	}
+}
+
+// Save the registered agents to file
+func (nodes *Nodes) Save() {
+	nodesJSON, _ := json.Marshal(nodes)
+	ioutil.WriteFile("registered_agents.json", nodesJSON, os.ModePerm)
+}
+
+// Load registered nodes from file
+func (nodes *Nodes) Load() {
+	nodes.Registered = nil
+	jsonByte, _ := ioutil.ReadFile("registered_agents.json")
+	json.Unmarshal(jsonByte, nodes)
+}
+
+// Node represents one of the Cluster node
 type Node struct {
-	ID                 string             `gorethink:"id,omitempty"`
-	Hostname           string             `gorethink:"hostname"`
-	Distro             string             `gorethink:"distro"`
-	Kernel             string             `gorethink:"kernel"`
-	Model              string             `gorethink:"model"`
-	IP                 string             `gorethink:"ip"`
-	Params             []Param            `gorethink:"params"`
-	RegisterDate       time.Time          `gorethink:"registered_at"`
-	LastConnectionDate time.Time          `gorethink:"last_connection_at"`
-	LastUpdatedDate    time.Time          `gorethink:"last_updated_at"`
-	NetworkInterfaces  []NetworkInterface `gorethink:"network_interfaces"`
+	Hostname           string             `json:"hostname"`
+	Distro             string             `json:"distro"`
+	Kernel             string             `json:"kernel"`
+	Model              string             `json:"model"`
+	IP                 string             `json:"ip"`
+	Params             []Param            `json:"params"`
+	LastConnectionDate time.Time          `json:"last_connection_at"`
+	LastUpdatedDate    time.Time          `json:"last_updated_at"`
+	NetworkInterfaces  []NetworkInterface `json:"network_interfaces"`
 }
 
 // Param represents a instance of servers monitored parameter
 type Param struct {
-	Label   string `gorethink:"label"`
-	Value   string `gorethink:"value"`
-	Unit    string `gorethink:"unit"`
-	Warning string `gorethink:"warning_target"`
-	Danger  string `gorethink:"danger_target"`
+	Label   string `json:"label"`
+	Value   string `json:"value"`
+	Unit    string `json:"unit"`
+	Warning string `json:"warning_target"`
+	Danger  string `json:"danger_target"`
 }
 
 // NetworkInterface represents server network card
 type NetworkInterface struct {
-	Name string `gorethink:"name"`
-	MAC  string `gorethink:"mac_addr"`
-	IP   string `gorethink:"ip"`
+	Name string `json:"name"`
+	MAC  string `json:"mac_addr"`
+	IP   string `json:"ip"`
 }
 
-//Update reload node attributes
+// Update reload node attributes
 func (n *Node) Update() {
 	n.LastUpdatedDate = time.Now()
 	n.Hostname, _ = os.Hostname()
@@ -49,22 +81,11 @@ func (n *Node) Update() {
 	getInterfaces(&n.NetworkInterfaces)
 }
 
-// NewNode load node from db or create if it does not exists
-func NewNode(db *DBConn) *Node {
+// NewNode returns a new node intance
+func NewNode() *Node {
 	n := Node{}
-	n.Hostname, _ = os.Hostname()
-
-	db.LoadNode(&n)
-
-	n.Update()
 	n.LastConnectionDate = time.Now()
-	if n.ID == "" {
-		n.RegisterDate = time.Now()
-		db.Insert(DBNodesTable, n)
-		log.Printf("Node: %s registered", n.Hostname)
-	} else {
-		db.Update(DBNodesTable, n.ID, n)
-	}
+	n.Update()
 	return &n
 }
 
