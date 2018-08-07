@@ -64,8 +64,8 @@ type Param struct {
 	Label   string `json:"label"`
 	Value   string `json:"value"`
 	Unit    string `json:"unit"`
-	Warning string `json:"warning_target"`
-	Danger  string `json:"danger_target"`
+	Warning string `json:"warning"`
+	Danger  string `json:"danger"`
 }
 
 // NetworkInterface represents server network card
