@@ -21,6 +21,7 @@ var (
 
 func main() {
 	flag.StringVar(&wsPort, "port", "5000", "WebSocket listening port")
+	registeredAgentsJSONFolder := flag.String("f", "", "Path to folder where is going to be saved the JSON file")
 
 	flag.Parse()
 
@@ -28,6 +29,7 @@ func main() {
 	fmt.Println(" Hydra Cluster Monitor - Server - v1.0 ")
 	fmt.Println("---------------------------------------")
 
+	lib.RegisteredAgentsFolder = *registeredAgentsJSONFolder
 	registeredNodes = lib.Nodes{}
 	registeredNodes.Load()
 

@@ -10,6 +10,9 @@ import (
 	"time"
 )
 
+// RegisteredAgentsFolder defines the folder to save the json file with the registered agents
+var RegisteredAgentsFolder string
+
 // Nodes represents a list of registered nodes
 type Nodes struct {
 	Registered []Node `json:"registered"`
@@ -33,13 +36,13 @@ func (nodes *Nodes) Unregister(node Node) {
 // Save the registered agents to file
 func (nodes *Nodes) Save() {
 	nodesJSON, _ := json.Marshal(nodes)
-	ioutil.WriteFile("registered_agents.json", nodesJSON, os.ModePerm)
+	ioutil.WriteFile(RegisteredAgentsFolder+"registered_agents.json", nodesJSON, os.ModePerm)
 }
 
 // Load registered nodes from file
 func (nodes *Nodes) Load() {
 	nodes.Registered = nil
-	jsonByte, _ := ioutil.ReadFile("registered_agents.json")
+	jsonByte, _ := ioutil.ReadFile(RegisteredAgentsFolder + "registered_agents.json")
 	json.Unmarshal(jsonByte, nodes)
 }
 
