@@ -13,12 +13,9 @@ import (
 	"github.com/hydra-cluster/monitor/lib/ws"
 )
 
-var (
-	libFolder = "../../lib/"
-)
-
 func main() {
 	var addr = flag.String("addr", "localhost:5000", "http service address")
+	var folder = flag.String("lib", "../../lib/", "path to lib execCommand.py folder")
 
 	flag.Parse()
 
@@ -26,7 +23,7 @@ func main() {
 	fmt.Println(" Hydra Cluster Monitor - Agent - v1.0 ")
 	fmt.Println("--------------------------------------")
 
-	monitor.ExecCommandFolder = libFolder
+	monitor.ExecCommandFolder = *folder
 
 	node := monitor.NewNode()
 
