@@ -64,6 +64,7 @@ func (c *Client) Close() {
 	if c.hub != nil {
 		c.hub.unregister <- c
 	}
+	log.Printf("Disconnected %s client: %s", c.mode, c.id)
 }
 
 // Run start the client read and write handlers
