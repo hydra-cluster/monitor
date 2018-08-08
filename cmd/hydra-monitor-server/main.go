@@ -49,6 +49,9 @@ func handlerReadMessage(hub *ws.Hub, msg *ws.Message) {
 		jsonString, _ := json.Marshal(msg.Content)
 		json.Unmarshal(jsonString, &node)
 		switch msg.Action {
+		case "get-registered-agents":
+			hub.Emit(ws.NewMessage(msg.From, "server", "registered-agents", registeredNodes))
+			return
 		case "agent-register":
 			registeredNodes.Register(node)
 		case "agent-unregister":

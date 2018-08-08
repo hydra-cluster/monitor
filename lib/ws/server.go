@@ -43,11 +43,6 @@ func wsHandler(hub *Hub, readHandler func(*Hub, *Message), registeredNodes inter
 	client.readHandler = readHandler
 	go client.Run()
 
-	if client.mode == "web" {
-		client.Emit(NewMessage(client.id, "server", "registered-agents", registeredNodes))
-		log.Printf("Send registered agents")
-	}
-
 	client.hub.register <- client
 
 	log.Printf("Connected %s client: %s", client.mode, client.id)
