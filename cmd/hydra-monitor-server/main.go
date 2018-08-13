@@ -7,21 +7,24 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
+	"time"
 
-	"github.com/hydra-cluster/monitor/lib"
-	"github.com/hydra-cluster/monitor/lib/ws"
+	monitor "github.com/hydra-cluster/monitor/lib"
+	socket "github.com/hydra-cluster/monitor/lib/ws"
 )
 
+const clusterPassword = "pipocadoce"
+
 var (
-	wsPort          string
-	registeredNodes lib.Nodes
-	libFolder       = "../../lib/"
+	agents agentsManager
+	folder *string
 )
 
 func main() {
-	flag.StringVar(&wsPort, "port", "5000", "WebSocket listening port")
-	registeredAgentsJSONFolder := flag.String("f", "", "Path to folder where is going to be saved the JSON file")
+	port := flag.String("port", "5000", "WebSocket listening port")
+	folder = flag.String("f", "", "Path to folder where is going to be saved the JSON file")
 
 	flag.Parse()
 
@@ -29,11 +32,10 @@ func main() {
 	fmt.Println(" Hydra Cluster Monitor - Server - v1.0 ")
 	fmt.Println("---------------------------------------")
 
-	lib.RegisteredAgentsFolder = *registeredAgentsJSONFolder
-	registeredNodes = lib.Nodes{}
-	registeredNodes.Load()
+	agents = agentsManager{}
+	agents.load(*folder)
 
-	go ws.StartWebsocketServer(wsPort, handlerReadMessage, &registeredNodes)
+	go socket.StartWebsocketServer(*port, handlerReadMessage)
 
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
@@ -43,22 +45,61 @@ func main() {
 	os.Exit(1)
 }
 
-func handlerReadMessage(hub *ws.Hub, msg *ws.Message) {
-	if msg.To == "server" {
-		node := lib.Node{}
-		jsonString, _ := json.Marshal(msg.Content)
-		json.Unmarshal(jsonString, &node)
-		switch msg.Action {
-		case "get-registered-agents":
-			hub.Emit(ws.NewMessage(msg.From, "server", "registered-agents", registeredNodes))
-			return
-		case "agent-register":
-			registeredNodes.Register(node)
-		case "agent-unregister":
-			registeredNodes.Unregister(node)
+func handlerReadMessage(msg *socket.Message) {
+	switch msg.Action {
+	case "register_new_agent":
+		agent := monitor.Agent{}
+		jsonBytes, _ := json.Marshal(msg.Content)
+		json.Unmarshal(jsonBytes, &agent)
+		agents.register(agent)
+		agents.save(*folder)
+	case "registered_agents":
+		socket.ServerHub.Emit(
+			&socket.Message{
+				Action:  msg.Action,
+				To:      msg.From,
+				From:    "server",
+				Status:  "200",
+				Content: agents,
+			})
+	case "update_agent_data":
+		socket.ServerHub.Emit(msg)
+	case "execute_task":
+		if strings.Contains(msg.From, "web") {
+			var objmap map[string]*json.RawMessage
+			jsonBytes, _ := json.Marshal(msg.Content)
+			json.Unmarshal(jsonBytes, &objmap)
+			var pwd string
+			json.Unmarshal(*objmap["password"], &pwd)
+			var task monitor.Task
+			json.Unmarshal(*objmap["task"], &task)
+			task.Start = time.Now()
+			//invalid password
+			if pwd != clusterPassword {
+				task.Output = "Unauthorized invalid password"
+				task.Status = "401"
+				task.End = time.Now()
+				socket.ServerHub.Emit(
+					&socket.Message{
+						Action:  msg.Action,
+						To:      msg.From,
+						From:    "server",
+						Status:  "401",
+						Content: task,
+					})
+				return
+			}
+			//broadcast to all web clients and agents the new task executing
+			socket.ServerHub.Emit(
+				&socket.Message{
+					Action:  msg.Action,
+					To:      "all",
+					From:    "server",
+					Status:  "200",
+					Content: task,
+				})
+		} else if strings.Contains(msg.From, "head") {
+			socket.ServerHub.Emit(msg)
 		}
-		registeredNodes.Save()
-		return
 	}
-	hub.Emit(msg)
 }

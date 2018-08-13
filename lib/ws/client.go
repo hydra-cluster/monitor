@@ -26,10 +26,8 @@ type Client struct {
 	mode string
 	// Defines id for hub communication.
 	id string
-	// Dialer defines if this client is created using a dial to a server.
-	dialer bool
 	// A function to handler the read message.
-	readHandler func(*Hub, *Message)
+	readHandler func(*Message)
 }
 
 func (c *Client) read() {
@@ -38,7 +36,7 @@ func (c *Client) read() {
 		if err := c.conn.ReadJSON(&msg); err != nil {
 			return
 		}
-		c.readHandler(c.hub, &msg)
+		c.readHandler(&msg)
 	}
 }
 
@@ -64,7 +62,7 @@ func (c *Client) Close() {
 	if c.hub != nil {
 		c.hub.unregister <- c
 	}
-	log.Printf("Disconnected %s client: %s", c.mode, c.id)
+	log.Printf("Disconnected %s: %s", c.mode, c.id)
 }
 
 // Run start the client read and write handlers
@@ -83,7 +81,7 @@ func (c *Client) Emit(msg *Message) error {
 }
 
 // Dial creates a new client connected to the server
-func Dial(url, id, mode string, readHandler func(*Hub, *Message)) *Client {
+func Dial(url, id, mode string, readHandler func(*Message)) *Client {
 	conn, _, err := websocket.DefaultDialer.Dial(url, nil)
 	if err != nil {
 		log.Fatal(err)
@@ -93,7 +91,6 @@ func Dial(url, id, mode string, readHandler func(*Hub, *Message)) *Client {
 	c.send = make(chan interface{})
 	c.id = id
 	c.mode = mode
-	c.dialer = true
 	c.readHandler = readHandler
 	return c
 }

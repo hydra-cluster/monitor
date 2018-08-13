@@ -1,21 +1,26 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
 	monitor "github.com/hydra-cluster/monitor/lib"
-	"github.com/hydra-cluster/monitor/lib/ws"
+	socket "github.com/hydra-cluster/monitor/lib/ws"
 )
+
+var client *socket.Client
+var agent *monitor.Agent
 
 func main() {
 	var addr = flag.String("addr", "localhost:5000", "http service address")
-	var folder = flag.String("lib", "../../lib/", "path to lib execCommand.py folder")
+	var libFolder = flag.String("lib", "../../lib/", "path to lib execCommand.py folder")
 
 	flag.Parse()
 
@@ -23,21 +28,21 @@ func main() {
 	fmt.Println(" Hydra Cluster Monitor - Agent - v1.0 ")
 	fmt.Println("--------------------------------------")
 
-	monitor.ExecCommandFolder = *folder
+	monitor.ExecCommandFolder = *libFolder
 
-	node := monitor.NewNode()
+	agent = monitor.NewAgent()
 
-	url := "ws://" + *addr + "/ws?id=" + node.Hostname + "&mode=agent"
+	url := "ws://" + *addr + "/ws?id=" + agent.Hostname + "&mode=agent"
 	log.Printf("connecting to %s", url)
 
-	client := ws.Dial(url, node.Hostname, "agent", handlerReadMessage)
+	client = socket.Dial(url, agent.Hostname, "agent", handlerReadMessage)
 	go client.Run()
+
+	log.Println("Registering agent")
+	client.Emit(socket.NewMessage("server", agent.Hostname, "register_new_agent", "", *agent))
 
 	log.Println("Synchronizing Agent")
 	time.Sleep(time.Now().Truncate(5 * time.Second).Add(5 * time.Second).Sub(time.Now()))
-
-	log.Println("Registering agent")
-	client.Emit(ws.NewMessage("server", node.Hostname, "agent-register", *node))
 
 	log.Println("Agent ready")
 
@@ -55,8 +60,11 @@ func main() {
 	for {
 		select {
 		case <-ticker.C:
-			node.Update()
-			err := client.Emit(ws.NewMessage("broadcast", node.Hostname, "updated-agent", *node))
+			if agent.Status != "Executing task" {
+				agent.Status = "Online"
+			}
+			agent.Update()
+			err := client.Emit(socket.NewMessage("clients", agent.Hostname, "update_agent_data", "", *agent))
 			if err != nil {
 				return
 			}
@@ -64,6 +72,21 @@ func main() {
 	}
 }
 
-func handlerReadMessage(hub *ws.Hub, msg *ws.Message) {
-
+func handlerReadMessage(msg *socket.Message) {
+	if msg.Action == "execute_task" {
+		task := monitor.Task{}
+		jsonBytes, _ := json.Marshal(msg.Content)
+		json.Unmarshal(jsonBytes, &task)
+		if strings.Contains(task.Target, agent.Hostname) {
+			output, err := monitor.ExecuteCommand(task.Command)
+			if err != nil {
+				task.Status = "500"
+				task.Output = err.Error()
+			} else {
+				task.Status = "200"
+				task.Output = string(output)
+			}
+			client.Emit(socket.NewMessage("clients", agent.Hostname, msg.Action, "200", task))
+		}
+	}
 }

@@ -7,22 +7,24 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+// ServerHub used to interact with the server clients
+var ServerHub *Hub
 var upgrader = websocket.Upgrader{}
 
 // StartWebsocketServer start server listening for messages on defined port.
-func StartWebsocketServer(port string, readHandler func(*Hub, *Message), registeredNodes interface{}) {
-	hub := newHub()
-	go hub.run()
+func StartWebsocketServer(port string, readHandler func(*Message)) {
+	ServerHub = newHub()
+	go ServerHub.run()
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		wsHandler(hub, readHandler, registeredNodes, w, r)
+		wsHandler(readHandler, w, r)
 	})
 	log.Println("Started WebSocket communications at port " + port)
 	log.Fatal(http.ListenAndServe(":"+port, mux))
 }
 
-func wsHandler(hub *Hub, readHandler func(*Hub, *Message), registeredNodes interface{}, w http.ResponseWriter, r *http.Request) {
+func wsHandler(readHandler func(*Message), w http.ResponseWriter, r *http.Request) {
 	upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -33,17 +35,16 @@ func wsHandler(hub *Hub, readHandler func(*Hub, *Message), registeredNodes inter
 	val := r.URL.Query()
 
 	client := &Client{
-		hub:    hub,
-		conn:   conn,
-		send:   make(chan interface{}),
-		id:     val["id"][0],
-		mode:   val["mode"][0],
-		dialer: false,
+		hub:  ServerHub,
+		conn: conn,
+		send: make(chan interface{}),
+		id:   val["id"][0],
+		mode: val["mode"][0],
 	}
 	client.readHandler = readHandler
 	go client.Run()
 
 	client.hub.register <- client
 
-	log.Printf("Connected %s client: %s", client.mode, client.id)
+	log.Printf("Connected %s: %s", client.mode, client.id)
 }
