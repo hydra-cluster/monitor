@@ -5,9 +5,9 @@ import App from './App'
 import ServerSocket from './socket'
 import store from './store'
 
-require('bulma/css/bulma.css')
-require('bulma-extensions/bulma-pageloader/dist/css/bulma-pageloader.min.css')
-require('font-awesome/css/font-awesome.min.css')
+import 'bulma/css/bulma.css'
+import 'bulma-extensions/bulma-pageloader/dist/css/bulma-pageloader.min.css'
+import 'font-awesome/css/font-awesome.min.css'
 
 Vue.config.productionTip = false
 
