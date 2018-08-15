@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"os"
 
 	monitor "github.com/hydra-cluster/monitor/lib"
@@ -36,19 +35,13 @@ func (agents *AgentsManager) unregister(agent monitor.Agent) {
 
 // Save the registered agents to file
 func (agents *AgentsManager) save(folder string) {
-	agentsJSON, err := json.Marshal(agents)
-	if err != nil {
-		log.Fatal(err)
-	}
+	agentsJSON, _ := json.Marshal(agents)
 	ioutil.WriteFile(folder+jsonFilename, agentsJSON, os.ModePerm)
 }
 
 // Load registered router from
 func (agents *AgentsManager) load(folder string) {
 	agents.Registered = nil
-	jsonByte, err := ioutil.ReadFile(folder + jsonFilename)
-	if err != nil {
-		log.Fatal(err)
-	}
+	jsonByte, _ := ioutil.ReadFile(folder + jsonFilename)
 	json.Unmarshal(jsonByte, agents)
 }
