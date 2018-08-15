@@ -1,22 +1,36 @@
 <template>
-  <div id="app">
-    <header>
-      <span>Vue.js PWA</span>
-    </header>
-    <main>
-      <img src="./assets/logo.png" alt="Vue.js PWA">
-      <hello></hello>
-    </main>
+<section class="hero is-dark is-fullheight">
+  <div class="pageloader is-info" :class="server.connected ? '' : 'is-active'" id="hydra-loader">
+    <span class="title">Connecting to Cluster Server... {{server.attempts}}</span>
   </div>
+  <div class="hero-head">
+    <cluster-menu></cluster-menu>
+  </div>
+  <div class="hero-body">
+    <cluster></cluster>
+  </div>
+  <div class="hero-foot">
+    <div class="content has-text-centered">
+      <p>Hydra Raspberry Pi Cluster Monitor - <strong>v1.0</strong></p>
+    </div>
+  </div>
+</section>
 </template>
 
 <script>
-import Hello from './components/Hello'
+import ClusterMenu from './components/Menu'
+import Cluster from './components/Cluster'
 
 export default {
   name: 'app',
   components: {
-    Hello
+    ClusterMenu,
+    Cluster
+  },
+  computed: {
+    server () {
+      return this.$store.getters.getServer
+    }
   }
 }
 </script>
@@ -31,29 +45,5 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
-}
-
-main {
-  text-align: center;
-  margin-top: 40px;
-}
-
-header {
-  margin: 0;
-  height: 56px;
-  padding: 0 16px 0 24px;
-  background-color: #35495E;
-  color: #ffffff;
-}
-
-header span {
-  display: block;
-  position: relative;
-  font-size: 20px;
-  line-height: 1;
-  letter-spacing: .02em;
-  font-weight: 400;
-  box-sizing: border-box;
-  padding-top: 16px;
 }
 </style>
