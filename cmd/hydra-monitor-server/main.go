@@ -18,7 +18,7 @@ import (
 const clusterPassword = "pipocadoce"
 
 var (
-	agents agentsManager
+	agents *AgentsManager
 	folder *string
 )
 
@@ -32,7 +32,7 @@ func main() {
 	fmt.Println(" Hydra Cluster Monitor - Server - v1.0 ")
 	fmt.Println("---------------------------------------")
 
-	agents = agentsManager{}
+	agents = &AgentsManager{}
 	agents.load(*folder)
 
 	go socket.StartWebsocketServer(*port, handlerReadMessage)
