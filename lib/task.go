@@ -4,7 +4,7 @@ import "time"
 
 // Task represents an command to be executed at the cluster node
 type Task struct {
-	Label   string    `json:"label"`
+	ID      string    `json:"id"`
 	Owner   string    `json:"owner"`
 	Command string    `json:"command"`
 	Target  string    `json:"target"`
