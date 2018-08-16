@@ -1,10 +1,19 @@
 <template>
-    <div class="container has-text-centered">
-      <h1 class="title">
-        Title
-      </h1>
-      <h2 class="subtitle">
-        Subtitle
-      </h2>
+    <div class="container">
+      <agent v-for="agent in agents" :key="agent.hostname"></agent>
     </div>
 </template>
+
+<script>
+import Agent from './Agent'
+export default {
+  components: {
+    Agent
+  },
+  computed: {
+    agents () {
+      return this.$store.getters.getAgents
+    }
+  }
+}
+</script>

@@ -15,6 +15,7 @@ export default class ServerSocket {
   connect () {
     var self = this
     this.socket = new WebSocket(url)
+    store.state.clientID = uuid
 
     // Connection stablished
     this.socket.onopen = function () {

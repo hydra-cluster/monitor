@@ -1,29 +1,25 @@
 <template>
-  <div class="container">
-    <nav class="level is-mobile">
-      <div class="level-left">
-        <div class="level-item has-text-centered">
-          <h1 class="title">#Hydra#</h1>
-        </div>
+  <nav class="level is-mobile">
+    <div class="level-left">
+      <div class="level-item has-text-centered">
+        <h1 class="title">HYDRA</h1>
       </div>
-      <div class="level-right">
-        <div class="level-item">
-          <a class="tags has-addons">
-            <span class="tag">
-              <span class="icon">
-                <i class="fa fa-plus"></i>
-              </span>
-            </span>
-            <span class="tag is-info has-text-weight-bold">New task</span>
-          </a>
-        </div>
-      </div>
-    </nav>
-  </div>
+    </div>
+    <div class="level-right">
+      <task></task>
+      <notifications></notifications>
+    </div>
+  </nav>
 </template>
 
 <script>
+import Notifications from './Notifications'
+import Task from './Task'
 export default {
-  name: 'cluster-menu'
+  name: 'cluster-menu',
+  components: {
+    Notifications,
+    Task
+  }
 }
 </script>

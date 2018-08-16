@@ -15,6 +15,8 @@
     "bulma-extensions": "^2.2.1",
     "font-awesome": "^4.7.0",
     "jquery": "^3.3.1",
+    "lodash": "^4.17.10",
+    "moment": "^2.22.2",
     "vue": "^2.5.2",
     "vuex": "^3.0.1"
   },

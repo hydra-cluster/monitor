@@ -1,5 +1,5 @@
 <template>
-<section class="hero is-dark is-fullheight">
+<div class="hero is-dark is-fullheight">
   <div class="pageloader is-info" :class="server.connected ? '' : 'is-active'" id="hydra-loader">
     <span class="title">Connecting to Cluster Server... {{server.attempts}}</span>
   </div>
@@ -10,11 +10,11 @@
     <cluster></cluster>
   </div>
   <div class="hero-foot">
-    <div class="content has-text-centered">
-      <p>Hydra Raspberry Pi Cluster Monitor - <strong>v1.0</strong></p>
-    </div>
+    <p class="content has-text-centered is-size-7">
+      Hydra Raspberry Pi Cluster Monitor - <strong>v1.0</strong>
+    </p>
   </div>
-</section>
+</div>
 </template>
 
 <script>
@@ -45,5 +45,9 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
+}
+
+.hero-head {
+  margin: 10px 10px 0 10px;
 }
 </style>

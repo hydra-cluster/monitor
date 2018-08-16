@@ -1,0 +1,111 @@
+<template>
+  <div class="level-item">
+    <a class="button is-primary" @click="openModal" >
+      <span class="icon is-small">
+        <i class="fa fa-terminal"></i>
+      </span>
+    </a>
+    <div class="modal" :class="active ? 'is-active' : ''">
+      <div class="modal-background" @click="closeModal"></div>
+      <div class="modal-card">
+        <header class="modal-card-head">
+          <p class="modal-card-title">Execute command</p>
+          <button class="delete" @click="closeModal"></button>
+        </header>
+        <section class="modal-card-body">
+          <div class="columns">
+            <div class="column is-one-third has-text-grey-dark">
+              <div class="field" v-for="agent in agents" :key="agent.hostname">
+                <input :id="agent.hostname" type="checkbox" :value="agent.hostname" class="switch is-rounded" v-model="checkedAgents">
+                <label :for="agent.hostname">{{agent.hostname}}</label>
+              </div>
+            </div>
+            <div class="column">
+              <div class="field">
+                <div class="control has-text-grey-dark">
+                  <label class="radio">
+                    <input type="radio" name="action" value="reboot" v-model="action">
+                    Reboot
+                  </label>
+                  <label class="radio">
+                    <input type="radio" name="action" value="shutdown" v-model="action">
+                    Shutdown
+                  </label>
+                  <label class="radio">
+                    <input type="radio" name="action" value="custom" v-model="action">
+                    Custom
+                  </label>
+                </div>
+              </div>
+              <div class="field" :class="action === 'custom' ? '' : 'is-hidden' ">
+                <div class="control">
+                  <textarea class="textarea" placeholder="Custom Command" v-model="command" rows="2"></textarea>
+                </div>
+              </div>
+              <div class="field">
+                <p class="control has-icons-left">
+                  <input class="input" type="password" placeholder="Password" v-model="password">
+                  <span class="icon is-small is-left">
+                    <i class="fa fa-lock"></i>
+                  </span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+        <footer class="modal-card-foot">
+          <button class="button is-success" @click="newTask">Create task</button>
+          <button class="button" @click="closeModal">Cancel</button>
+        </footer>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'task',
+  data: function () {
+    return {
+      active: false,
+      checkedAgents: [],
+      action: '',
+      command: '',
+      password: ''
+    }
+  },
+  computed: {
+    agents () {
+      return this.$store.getters.getAgents
+    },
+    customCommand () {
+      return this.action === 'custom'
+    }
+  },
+  methods: {
+    openModal () {
+      this.active = true
+    },
+    closeModal () {
+      this.active = false
+    },
+    newTask () {
+      const task = {
+        id: Math.floor(new Date().valueOf() * Math.random()),
+        owner: this.$store.state.clientID,
+        command: this.customCommand ? this.command : this.action,
+        target: this.$_.join(this.checkedAgents, ','),
+        start: this.$moment()
+      }
+      this.$store.commit('updateTask', task)
+      this.active = false
+    }
+  }
+}
+</script>
+
+<style>
+.checkbox + .checkbox {
+    margin-left: .5em;
+}
+</style>
