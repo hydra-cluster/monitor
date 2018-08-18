@@ -45,6 +45,5 @@ func wsHandler(readHandler func(*Message), w http.ResponseWriter, r *http.Reques
 	go client.Run()
 
 	client.hub.register <- client
-
-	log.Printf("Connected %s: %s", client.mode, client.id)
+	log.Printf("\033[92mConnected   \033[0m: %s", client.id)
 }
