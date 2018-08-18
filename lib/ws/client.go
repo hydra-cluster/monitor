@@ -13,6 +13,8 @@ var connectionClosed = false
 const (
 	// Time allowed to write a message to the peer.
 	writeWait = 10 * time.Second
+	// Interval to send ping message to client
+	pingPeriod = 60 * time.Second
 )
 
 // Client is a middleman between the websocket connection and the hub.
@@ -41,13 +43,20 @@ func (c *Client) read() {
 }
 
 func (c *Client) write() {
-	defer c.Close()
+	ticker := time.NewTicker(pingPeriod)
+
+	defer func() {
+		ticker.Stop()
+		c.Close()
+	}()
 
 	for {
 		select {
 		case message := <-c.send:
+			c.conn.WriteJSON(message)
+		case <-ticker.C:
 			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
-			if err := c.conn.WriteJSON(message); err != nil {
+			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
 				return
 			}
 		}
@@ -62,7 +71,7 @@ func (c *Client) Close() {
 	if c.hub != nil {
 		c.hub.unregister <- c
 	}
-	log.Printf("Disconnected %s: %s", c.mode, c.id)
+	log.Printf("\033[93mDisconnected\033[0m: %s", c.id)
 }
 
 // Run start the client read and write handlers
