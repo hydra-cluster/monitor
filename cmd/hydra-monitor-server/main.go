@@ -71,13 +71,12 @@ func handlerReadMessage(msg *socket.Message) {
 			json.Unmarshal(jsonBytes, &objmap)
 			var pwd string
 			json.Unmarshal(*objmap["password"], &pwd)
-			var task monitor.Task
+			task := monitor.Task{}
 			json.Unmarshal(*objmap["task"], &task)
-			task.Start = time.Now()
 			//invalid password
 			if pwd != clusterPassword {
-				task.Output = "Unauthorized invalid password"
-				task.Status = "401"
+				task.Output = "Unauthorized - invalid password"
+				task.Status = "Invalid password"
 				task.End = time.Now()
 				socket.ServerHub.Emit(
 					&socket.Message{
@@ -89,7 +88,8 @@ func handlerReadMessage(msg *socket.Message) {
 					})
 				return
 			}
-			//broadcast to all web clients and agents the new task executing
+			//broadcast to all web clients and agents the new task processing
+			task.Status = "Processing"
 			socket.ServerHub.Emit(
 				&socket.Message{
 					Action:  msg.Action,

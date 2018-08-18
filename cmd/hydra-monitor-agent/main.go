@@ -60,9 +60,7 @@ func main() {
 	for {
 		select {
 		case <-ticker.C:
-			if agent.Status != "Executing task" {
-				agent.Status = "Online"
-			}
+			agent.Status = "Online"
 			agent.Update()
 			err := client.Emit(socket.NewMessage("clients", agent.Hostname, "update_agent_data", "", *agent))
 			if err != nil {
@@ -78,12 +76,12 @@ func handlerReadMessage(msg *socket.Message) {
 		jsonBytes, _ := json.Marshal(msg.Content)
 		json.Unmarshal(jsonBytes, &task)
 		if strings.Contains(task.Target, agent.Hostname) {
-			output, err := monitor.ExecuteCommand(task.Command)
+			output, err := monitor.ExecuteCommand(task.ParseCommand())
 			if err != nil {
-				task.Status = "500"
+				task.Status = "Error"
 				task.Output = err.Error()
 			} else {
-				task.Status = "200"
+				task.Status = "Done"
 				task.Output = string(output)
 			}
 			client.Emit(socket.NewMessage("clients", agent.Hostname, msg.Action, "200", task))
