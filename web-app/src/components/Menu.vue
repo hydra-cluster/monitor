@@ -6,7 +6,7 @@
       </div>
     </div>
     <div class="level-right">
-      <task></task>
+      <new-task></new-task>
       <notifications></notifications>
     </div>
   </nav>
@@ -14,12 +14,12 @@
 
 <script>
 import Notifications from './Notifications'
-import Task from './Task'
+import NewTask from './NewTask'
 export default {
   name: 'cluster-menu',
   components: {
     Notifications,
-    Task
+    NewTask
   }
 }
 </script>

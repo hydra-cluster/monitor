@@ -10,10 +10,7 @@
     </div>
     <div class="dropdown-menu" role="menu">
       <div class="dropdown-content">
-        <div class="dropdown-item" v-for="task in tasks" :key="task.id">
-            <p>{{task.start}}</p>
-            <p>New task execution command: {{task.command}}</p>
-        </div>
+        <notification-item v-for="task in tasks" :key="task.id"></notification-item>
         <hr class="dropdown-divider">
         <a class="dropdown-item" @click="clearAllTasks">
           <span class="icon is-medium">
@@ -28,8 +25,12 @@
 </template>
 
 <script>
+import NotificationItem from './NotificationItem'
 export default {
   name: 'notifications',
+  components: {
+    NotificationItem
+  },
   data: function () {
     return {
       active: false
@@ -49,6 +50,13 @@ export default {
     clearAllTasks () {
       this.$store.commit('removeAllTasks')
       this.active = false
+    }
+  },
+  watch: {
+    tasks: function (value) {
+      if (value.length <= 0) {
+        this.active = false
+      }
     }
   }
 }

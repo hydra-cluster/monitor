@@ -9,6 +9,7 @@ export default class ServerSocket {
   }
 
   send (content) {
+    console.log(content)
     this.socket.send(JSON.stringify(content))
   }
 

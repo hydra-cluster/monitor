@@ -1,6 +1,6 @@
 <template>
   <div class="level-item">
-    <a class="button is-primary" @click="openModal" >
+    <a class="button is-primary" :class="taskInProgress ? 'is-loading' : ''" @click="openModal" >
       <span class="icon is-small">
         <i class="fa fa-terminal"></i>
       </span>
@@ -64,7 +64,7 @@
 
 <script>
 export default {
-  name: 'task',
+  name: 'new-task',
   data: function () {
     return {
       active: false,
@@ -80,6 +80,9 @@ export default {
     },
     customCommand () {
       return this.action === 'custom'
+    },
+    taskInProgress () {
+      return this.$store.getters.taskInProgress
     }
   },
   methods: {
@@ -91,14 +94,28 @@ export default {
     },
     newTask () {
       const task = {
-        id: Math.floor(new Date().valueOf() * Math.random()),
+        id: 'task.' + Math.floor(new Date().valueOf() * Math.random()),
         owner: this.$store.state.clientID,
+        action: this.customCommand ? 'execute custom command at' : this.action.toLowerCase(),
         command: this.customCommand ? this.command : this.action,
         target: this.$_.join(this.checkedAgents, ','),
-        start: this.$moment()
+        status: 'Requested',
+        start: this.$moment().format()
       }
       this.$store.commit('updateTask', task)
       this.active = false
+
+      // Emit message to the server
+      const message = {
+        to: 'server',
+        from: task.owner,
+        action: 'execute_task',
+        content: {
+          password: this.password,
+          task: task
+        }
+      }
+      this.$server.send(message)
     }
   }
 }

@@ -13,7 +13,9 @@ export default new Vuex.Store({
       connected: false,
       attempts: 0
     },
-    invalidPassword: false
+    invalidPassword: false,
+    taskInProgress: false
+
   },
   getters: {
     getServer (state) {
@@ -27,6 +29,12 @@ export default new Vuex.Store({
     },
     getTasks (state) {
       return state.tasks
+    },
+    getTaskByID: (state) => (id) => {
+      return state.tasks.find(task => task.id === id)
+    },
+    taskInProgress (state) {
+      return state.taskInProgress
     }
   },
   mutations: {
@@ -42,7 +50,12 @@ export default new Vuex.Store({
       if (taskIndex !== -1) {
         state.tasks.splice(taskIndex, 1)
       }
-      state.tasks.push(task)
+      state.tasks.unshift(task)
+      if (task.status === 'Requested' || task.status === 'Processing') {
+        state.taskInProgress = true
+      } else {
+        state.taskInProgress = false
+      }
     },
     removeTask (state, id) {
       const taskIndex = _.findIndex(state.tasks, {'id': id})
@@ -52,6 +65,7 @@ export default new Vuex.Store({
     },
     removeAllTasks (state) {
       state.tasks = []
+      state.taskInProgress = false
     }
   }
 })
