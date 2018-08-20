@@ -1,6 +1,6 @@
 <template>
 <div class="hero is-hydra is-primary is-fullheight is-bold">
-  <div class="pageloader is-primary" :class="server.connected ? '' : 'is-active'" id="hydra-loader">
+  <div class="pageloader is-link" :class="server.connected ? '' : 'is-active'" id="hydra-loader">
     <span class="title">Connecting to Cluster Server... {{server.attempts}}</span>
   </div>
   <div class="hero-head">

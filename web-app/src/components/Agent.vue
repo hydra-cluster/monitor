@@ -21,16 +21,16 @@
     <div class="card-content" :class="contentOpen ? '' : 'is-hidden'">
       <div> <!-- CPU -->
         <div class="columns is-mobile"> 
-          <div class="column is-2 has-text-white-ter">
+          <div class="column is-3 has-text-white-ter">
             CPU
           </div>
-          <div class="column is-3-desktop is-4-mobile is-size-7">
-            <span class="icon is-size-6">
-              <i class="fa fa-thermometer-half"></i>
+          <div class="column is-3 is-size-7 has-text-centered">
+            <span class="icon">
+              <i class="fa fa-thermometer-half is-size-5"></i>
+              <span style="margin-left: 5px">56.7c</span>
             </span>
-            56.7c
           </div>
-          <div class="column is-7-desktop is-6-mobile is-size-7">
+          <div class="column is-6 is-size-7">
             <span>Load average: 45%</span>
             <progress class="progress is-small is-link" style="margin: 0px; height: 3px!important;" value="45" max="100"></progress>
           </div>
@@ -44,17 +44,17 @@
           <div class="column is-3">
             <span class="donut-peity" data-peity='{ "fill": ["#08A5E1", "#2A88C5", "#0058A1", "#222D33"],  "innerRadius": 18, "radius": 28 }' style="display: none;">31,24,46,0</span>
           </div>
-          <div class="column is-3">
+          <div class="column is-3 has-text-centered">
               <small><i class="fa fa-fw fa-circle" style="color:#08A5E1"></i> Using</small>
               <h5>5079 MB</h5>
               <p>31%</p>
           </div>
-          <div class="column is-3">
+          <div class="column is-3 has-text-centered">
               <small><i class="fa fa-fw fa-circle" style="color:#2A88C5"></i> Cache</small>
               <h5>3789 MB</h5>
               <p>24%</p>
           </div>
-          <div class="column is-3">
+          <div class="column is-3 has-text-centered">
               <small><i class="fa fa-fw fa-circle" style="color:#0058A1"></i> Free</small>
               <h5>3591 MB</h5>
               <p>46%</p>
@@ -76,12 +76,12 @@
             <div class="column is-3">
               <span class="donut-peity" data-peity='{ "fill": ["#2D99DC", "#222D33"], "innerRadius": 18, "radius": 28 }' style="display: none;">2/7</span>
             </div>
-            <div class="column is-3">
+            <div class="column is-3 has-text-centered">
                 <small><i class="fa fa-fw fa-circle" style="color:#2D99DC"></i> Used</small>
                 <h5>5079 MB</h5>
                 <p>31%</p>
             </div>
-            <div class="column is-3">
+            <div class="column is-3 has-text-centered">
                 <small><i class="fa fa-fw fa-circle" style="color:#222D33"></i> Free</small>
                 <h5>3789 MB</h5>
                 <p>24%</p>
@@ -100,12 +100,12 @@
             <div class="column is-3">
               <span class="donut-peity" data-peity='{ "fill": ["#2D99DC", "#222D33"], "innerRadius": 18, "radius": 28 }' style="display: none;">2/7</span>
             </div>
-            <div class="column is-3">
+            <div class="column is-3 has-text-centered">
                 <small><i class="fa fa-fw fa-circle" style="color:#2D99DC"></i> Used</small>
                 <h5>5079 MB</h5>
                 <p>31%</p>
             </div>
-            <div class="column is-3">
+            <div class="column is-3 has-text-centered">
                 <small><i class="fa fa-fw fa-circle" style="color:#222D33"></i> Free</small>
                 <h5>3789 MB</h5>
                 <p>24%</p>
