@@ -6,11 +6,14 @@ import ServerSocket from './socket'
 import store from './store'
 import moment from 'moment'
 import _ from 'lodash'
+import 'jquery'
+import 'peity'
 
 import 'bulma/css/bulma.css'
 import 'bulma-extensions/bulma-pageloader/dist/css/bulma-pageloader.min.css'
 import 'bulma-extensions/bulma-badge/dist/css/bulma-badge.min.css'
 import 'bulma-extensions/bulma-switch/dist/css/bulma-switch.min.css'
+import 'bulma-extensions/bulma-divider/dist/css/bulma-divider.min.css'
 import 'font-awesome/css/font-awesome.min.css'
 
 Vue.config.productionTip = false

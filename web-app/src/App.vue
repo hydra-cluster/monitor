@@ -1,6 +1,6 @@
 <template>
-<div class="hero is-dark is-fullheight">
-  <div class="pageloader is-info" :class="server.connected ? '' : 'is-active'" id="hydra-loader">
+<div class="hero is-hydra is-primary is-fullheight is-bold">
+  <div class="pageloader is-primary" :class="server.connected ? '' : 'is-active'" id="hydra-loader">
     <span class="title">Connecting to Cluster Server... {{server.attempts}}</span>
   </div>
   <div class="hero-head">
@@ -41,7 +41,7 @@ body {
 }
 
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-family: -apple-system,"Helvetica Neue",Helvetica,"Segoe UI",Arial,sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
@@ -49,5 +49,9 @@ body {
 
 .hero-head {
   margin: 10px 10px 0 10px;
+}
+
+.is-hydra {
+
 }
 </style>

@@ -1,7 +1,9 @@
 <template>
-    <div class="container">
-      <agent v-for="agent in agents" :key="agent.hostname"></agent>
-    </div>
+<div class="container is-fluid">
+  <div class="columns is-multiline is-centered">
+    <agent v-for="agent in agents" :key="agent.hostname"></agent>
+  </div>
+</div>
 </template>
 
 <script>
@@ -17,3 +19,9 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.is-fluid {
+  margin: 0px;
+}
+</style>

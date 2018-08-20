@@ -1,6 +1,6 @@
 <template>
   <div class="level-item">
-    <a class="button is-primary" :class="taskInProgress ? 'is-loading' : ''" @click="openModal" >
+    <a class="button is-link" :class="taskInProgress ? 'is-loading' : ''" @click="openModal" >
       <span class="icon is-small">
         <i class="fa fa-terminal"></i>
       </span>
