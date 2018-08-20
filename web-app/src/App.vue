@@ -50,8 +50,4 @@ body {
 .hero-head {
   margin: 10px 10px 0 10px;
 }
-
-.is-hydra {
-
-}
 </style>
