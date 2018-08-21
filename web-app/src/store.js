@@ -14,8 +14,8 @@ export default new Vuex.Store({
       attempts: 0
     },
     invalidPassword: false,
-    taskInProgress: false
-
+    taskInProgress: false,
+    allAgentsContentOpen: false
   },
   getters: {
     getServer (state) {

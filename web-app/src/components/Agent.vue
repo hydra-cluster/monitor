@@ -145,11 +145,19 @@ export default {
   computed: {
     agent () {
       return this.$store.getters.getAgentByHostname(this.$vnode.key)
+    },
+    openAllContents () {
+      return this.$store.state.allAgentsContentOpen
     }
   },
   methods: {
     toggleContent () {
       this.contentOpen = !this.contentOpen
+    }
+  },
+  watch: {
+    openAllContents: function () {
+      this.contentOpen = this.openAllContents
     }
   },
   mounted: function () {
