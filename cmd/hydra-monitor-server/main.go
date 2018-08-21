@@ -51,6 +51,7 @@ func handlerReadMessage(msg *socket.Message) {
 		agent := monitor.Agent{}
 		jsonBytes, _ := json.Marshal(msg.Content)
 		json.Unmarshal(jsonBytes, &agent)
+		agent.Status = "Offline"
 		agents.register(agent)
 		agents.save(*folder)
 	case "registered_agents":
