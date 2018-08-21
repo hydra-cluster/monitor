@@ -18,7 +18,7 @@ import 'font-awesome/css/font-awesome.min.css'
 
 Vue.config.productionTip = false
 
-const server = new ServerSocket(5000)
+const server = new ServerSocket('ws://192.168.15.32:5000', 5000)
 server.connect()
 server.handleMessage = function (message) {
   switch (message.action) {

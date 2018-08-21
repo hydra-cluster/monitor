@@ -1,10 +1,11 @@
 import store from './store'
 
 const uuid = 'web' + Math.floor(new Date().valueOf() * Math.random()) + '.hydra'
-const url = 'ws://192.168.15.32:5000/ws?id=' + uuid + '&mode=web'
+const urlParams = '/ws?id=' + uuid + '&mode=web'
 
 export default class ServerSocket {
-  constructor (timeToReconnect) {
+  constructor (serverURL, timeToReconnect) {
+    this.url = serverURL + urlParams
     this.reconnectInterval = timeToReconnect
   }
 
@@ -15,7 +16,7 @@ export default class ServerSocket {
 
   connect () {
     var self = this
-    this.socket = new WebSocket(url)
+    this.socket = new WebSocket(this.url)
     store.state.clientID = uuid
 
     // Connection stablished
