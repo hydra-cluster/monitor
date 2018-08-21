@@ -18,9 +18,10 @@ import 'font-awesome/css/font-awesome.min.css'
 
 Vue.config.productionTip = false
 
-const server = new ServerSocket('ws://192.168.15.32:5000', 5000)
+const server = new ServerSocket(process.env.SOCKET_SERVER_URL, 5000)
 server.connect()
 server.handleMessage = function (message) {
+  console.log(message)
   switch (message.action) {
     case 'registered_agents':
       store.state.agents = message.content.registered

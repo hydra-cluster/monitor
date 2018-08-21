@@ -41,9 +41,10 @@ export default new Vuex.Store({
     updateAgentData (state, agent) {
       const oldAgentIndex = _.findIndex(state.agents, {'hostname': agent.hostname})
       if (oldAgentIndex !== -1) {
-        state.agents.splice(oldAgentIndex, 1)
+        state.agents[oldAgentIndex] = agent
+      } else {
+        state.agents.push(agent)
       }
-      state.agents.push(agent)
     },
     updateTask (state, task) {
       const taskIndex = _.findIndex(state.tasks, {'id': task.id})

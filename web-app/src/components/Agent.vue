@@ -7,11 +7,11 @@
           <span class="icon">
             <i class="fa" :class="contentOpen ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
           </span>
-          head01.hydra
+          {{agent.hostname}}
         </span>
       </p>
       <p class="card-header-icon">
-        <span class="is-size-7" style="padding-right: 5px;">Online</span>
+        <span class="is-size-7" style="padding-right: 5px;">{{agent.status}}</span>
         <br>
         <span class="icon">
           <i class="fa fa-lg fa-server has-text-primary"></i>
@@ -117,15 +117,15 @@
         <div class="columns is-mobile is-size-7">
           <div class="column is-4">
             <p>Distro</p>
-            <p class="has-text-white-ter is-size-6">Raspbian strech lite</p>
+            <p class="has-text-white-ter is-size-6">{{agent.distro}}</p>
           </div>
           <div class="column is-4">
             <p>Kernel</p>
-            <p class="has-text-white-ter is-size-6">4.14 ARMv7</p>
+            <p class="has-text-white-ter is-size-6">{{agent.kernel}}</p>
           </div>
           <div class="column is-4">
             <p>Model</p>
-            <p class="has-text-white-ter is-size-6">RPi 3 model B+</p>
+            <p class="has-text-white-ter is-size-6">{{agent.model}}</p>
           </div>
         </div>
       </div>

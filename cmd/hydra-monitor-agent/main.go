@@ -60,9 +60,9 @@ func main() {
 	for {
 		select {
 		case <-ticker.C:
-			agent.Status = "Online"
 			agent.Update()
-			err := client.Emit(socket.NewMessage("clients", agent.Hostname, "update_agent_data", "", *agent))
+			agent.Status = "Online"
+			err := client.Emit(socket.NewMessage("clients", agent.Hostname, "update_agent_data", "", agent))
 			if err != nil {
 				return
 			}
