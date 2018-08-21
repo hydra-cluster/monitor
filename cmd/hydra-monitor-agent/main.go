@@ -38,13 +38,13 @@ func main() {
 	client = socket.Dial(url, agent.Hostname, "agent", handlerReadMessage)
 	go client.Run()
 
-	log.Println("Registering agent")
+	log.Println("registering agent")
 	client.Emit(socket.NewMessage("server", agent.Hostname, "register_new_agent", "", *agent))
 
-	log.Println("Synchronizing Agent")
+	log.Println("synchronizing Agent")
 	time.Sleep(time.Now().Truncate(5 * time.Second).Add(5 * time.Second).Sub(time.Now()))
 
-	log.Println("Agent ready")
+	log.Println("\033[92magent ready\033[0m")
 
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)

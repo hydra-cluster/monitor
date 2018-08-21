@@ -2,13 +2,17 @@ package ws
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"time"
 
 	"github.com/gorilla/websocket"
 )
 
-var connectionClosed = false
+var (
+	connectionClosed = false
+	serverURL        = ""
+)
 
 const (
 	// Time allowed to write a message to the peer.
@@ -53,11 +57,22 @@ func (c *Client) write() {
 	for {
 		select {
 		case message := <-c.send:
-			c.conn.WriteJSON(message)
+			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
+			if err := c.conn.WriteJSON(message); err != nil {
+				if serverURL != "" {
+					c.conn = reconnect()
+				} else {
+					return
+				}
+			}
 		case <-ticker.C:
 			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
-				return
+				if serverURL != "" {
+					c.conn = reconnect()
+				} else {
+					return
+				}
 			}
 		}
 	}
@@ -91,9 +106,10 @@ func (c *Client) Emit(msg *Message) error {
 
 // Dial creates a new client connected to the server
 func Dial(url, id, mode string, readHandler func(*Message)) *Client {
+	serverURL = url
 	conn, _, err := websocket.DefaultDialer.Dial(url, nil)
 	if err != nil {
-		log.Fatal(err)
+		conn = reconnect()
 	}
 	c := &Client{}
 	c.conn = conn
@@ -102,4 +118,24 @@ func Dial(url, id, mode string, readHandler func(*Message)) *Client {
 	c.mode = mode
 	c.readHandler = readHandler
 	return c
+}
+
+func reconnect() *websocket.Conn {
+	if connectionClosed {
+		return nil
+	}
+	log.Println("\033[91mserver unavailable\033[0m")
+	attemp := 0
+	for {
+		attemp++
+		time.Sleep(5 * time.Second)
+		dateStr := time.Now().Format("2006/01/02 15:04:05")
+		fmt.Printf("\r%s attempting %03d to reconnect", dateStr, attemp)
+		conn, _, err := websocket.DefaultDialer.Dial(serverURL, nil)
+		if err == nil {
+			fmt.Println("")
+			log.Println("\033[92magent reconnected successfully\033[0m")
+			return conn
+		}
+	}
 }
