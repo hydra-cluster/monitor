@@ -15,7 +15,7 @@ export default new Vuex.Store({
     },
     invalidPassword: false,
     taskInProgress: false,
-    allAgentsContentOpen: false
+    agentsContentVisible: []
   },
   getters: {
     getServer (state) {
@@ -35,6 +35,9 @@ export default new Vuex.Store({
     },
     taskInProgress (state) {
       return state.taskInProgress
+    },
+    getAgentContentVisible: (state) => (hostname) => {
+      return state.agentsContentVisible.find(agent => agent.hostname === hostname)
     }
   },
   mutations: {
@@ -67,6 +70,18 @@ export default new Vuex.Store({
     removeAllTasks (state) {
       state.tasks = []
       state.taskInProgress = false
+    },
+    setAgentContentVisible (state, agent) {
+      const agentIndex = _.findIndex(state.agentsContentVisible, {'hostname': agent.hostname})
+      if (agentIndex !== -1) {
+        state.agentsContentVisible.splice(agentIndex, 1)
+      }
+      state.agentsContentVisible.push(agent)
+    },
+    toogleAgentsContentVisible (state, show) {
+      _.forEach(state.agentsContentVisible, function (value) {
+        value.show = show
+      })
     }
   }
 })

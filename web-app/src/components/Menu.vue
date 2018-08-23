@@ -6,13 +6,7 @@
       </div>
     </div>
     <div class="level-right">
-      <div class="level-item">
-        <a class="button" @click="toggleAllContents">
-          <span class="icon is-small">
-            <i class="fa fa-2x has-text-primary" :class="openAllContents ? 'fa-chevron-circle-up' : 'fa-chevron-circle-down'"></i>
-          </span>
-        </a>
-      </div>
+      <config></config>
       <new-task></new-task>
       <notifications></notifications>
     </div>
@@ -20,23 +14,16 @@
 </template>
 
 <script>
-import Notifications from './Notifications'
+import Config from './Config'
 import NewTask from './NewTask'
+import Notifications from './Notifications'
+
 export default {
   name: 'cluster-menu',
   components: {
-    Notifications,
-    NewTask
-  },
-  computed: {
-    openAllContents () {
-      return this.$store.state.allAgentsContentOpen
-    }
-  },
-  methods: {
-    toggleAllContents () {
-      this.$store.state.allAgentsContentOpen = !this.$store.state.allAgentsContentOpen
-    }
+    Config,
+    NewTask,
+    Notifications
   }
 }
 </script>
