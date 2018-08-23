@@ -285,15 +285,15 @@ export default {
   padding-bottom: 10px;
 }
 .card-content {
-  padding: 0.3rem;
+  padding: 0.3rem !important;
 }
 .group {
   border-top: 1px solid #333131;
   padding-top: 10px;
-  margin: 20px 0 10px 0;
+  margin: 20px 0 10px 0 !important;
 }
 .columns {
-  margin: 0px;
+  margin: 0px !important;
 }
 .card-content .column {
   padding-top: 0px;
