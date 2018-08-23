@@ -48,20 +48,92 @@ else:
         value = subprocess.check_output(cmd, shell = True )
         n.Params.append(Param(value, "CPU Temp", "C", "70", "80" ))
 
-        cmd = "free -m | awk 'NR==2{printf \"%.2f\", $3*100/$2 }'"
+        cmd = "cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq"
         value = subprocess.check_output(cmd, shell = True )
-        n.Params.append(Param(value, "RAM", "%", "70", "85" ))
+        n.Params.append(Param(value, "CPU Freq", "Hz", "", "" ))
 
-        cmd = "free -m | awk 'NR==3{printf \"%.2f\", $3*100/$2 }'"
+        cmd = "free -m | awk 'NR==2{printf \"%.2f\", $2 }'"
         value = subprocess.check_output(cmd, shell = True )
-        n.Params.append(Param(value, "SWAP", "%", "50", "80" ))
-        
-        cmd = "df -h | awk '$NF==\"/\"{printf \"%s\", $5}' | head --bytes -1"
-        value = subprocess.check_output(cmd, shell = True )
-        n.Params.append(Param(value, "HDD", "%", "50", "85" ))
-        
-        cmd = "df -h | awk '$NF==\"/hydra/storage\"{printf \"%s\", $5}' | head --bytes -1"
-        value = subprocess.check_output(cmd, shell = True )
-        n.Params.append(Param(value, "Storage", "%", "50", "70" ))
+        n.Params.append(Param(value, "RAM Total", "MB", "70", "85" ))
 
-    print(n.toJSON())
+        cmd = "free -m | awk 'NR==2{printf \"%.2f\", $3 }'"
+        value = subprocess.check_output(cmd, shell = True )
+        n.Params.append(Param(value, "RAM Used", "MB", "70", "85" ))
+
+        cmd = "free -m | awk 'NR==3{printf \"%s\", $2 }'"
+        value = subprocess.check_output(cmd, shell = True )
+        n.Params.append(Param(value, "SWAP Total", "MB", "50", "80" ))
+
+        cmd = "free -m | awk 'NR==3{printf \"%s\", $3 }'"
+        value = subprocess.check_output(cmd, shell = True )
+        n.Params.append(Param(value, "SWAP Used", "MB", "50", "80" ))
+        
+        cmd = "df | awk '$NF==\"/\"{printf \"%s\", $2}'"
+        value = subprocess.check_output(cmd, shell = True )
+        n.Params.append(Param(value, "SD Card Total", "Bytes", "50", "85" ))
+
+        cmd = "df | awk '$NF==\"/\"{printf \"%s\", $3}'"
+        value = subprocess.check_output(cmd, shell = True )
+        n.Params.append(Param(value, "SD Card Used", "Bytes", "50", "85" ))
+        
+        cmd = "df | awk '$NF==\"/hydra/storage\"{printf \"%s\", $2}'"
+        value = subprocess.check_output(cmd, shell = True )
+        n.Params.append(Param(value, "Storage Total", "Bytes", "70", "85" ))
+
+        cmd = "df | awk '$NF==\"/hydra/storage\"{printf \"%s\", $3}'"
+        value = subprocess.check_output(cmd, shell = True )
+        n.Params.append(Param(value, "Storage Used", "Bytes", "70", "85" ))
+    
+        print(n.toJSON())
+    
+    else:
+
+        print("""{
+            "Distro": "Raspbian GNU/Linux 9 (stretch)", 
+            "Kernel": "4.14.62-v7+", 
+            "Model": " Raspberry Pi 3 Model B Plus Rev 1.3", 
+            "Params": [
+                {
+                    "Danger": "0.9", 
+                    "Label": "CPU Load", 
+                    "Unit": "", 
+                    "Value": "0.08", 
+                    "Warning": "0.7"
+                }, 
+                {
+                    "Danger": "80", 
+                    "Label": "CPU Temp", 
+                    "Unit": "C", 
+                    "Value": "54.8", 
+                    "Warning": "70"
+                }, 
+                {
+                    "Danger": "85", 
+                    "Label": "RAM", 
+                    "Unit": "%", 
+                    "Value": "4.85", 
+                    "Warning": "70"
+                }, 
+                {
+                    "Danger": "80", 
+                    "Label": "SWAP", 
+                    "Unit": "%", 
+                    "Value": "0.00", 
+                    "Warning": "50"
+                }, 
+                {
+                    "Danger": "85", 
+                    "Label": "HDD", 
+                    "Unit": "%", 
+                    "Value": "6", 
+                    "Warning": "50"
+                }, 
+                {
+                    "Danger": "70", 
+                    "Label": "Storage", 
+                    "Unit": "%", 
+                    "Value": "1", 
+                    "Warning": "50"
+                }
+            ]
+        }""")
