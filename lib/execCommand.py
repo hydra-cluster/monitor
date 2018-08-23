@@ -84,56 +84,5 @@ else:
         value = subprocess.check_output(cmd, shell = True )
         n.Params.append(Param(value, "Storage Used", "Bytes", "70", "85" ))
     
-        print(n.toJSON())
+    print(n.toJSON())
     
-    else:
-
-        print("""{
-            "Distro": "Raspbian GNU/Linux 9 (stretch)", 
-            "Kernel": "4.14.62-v7+", 
-            "Model": " Raspberry Pi 3 Model B Plus Rev 1.3", 
-            "Params": [
-                {
-                    "Danger": "0.9", 
-                    "Label": "CPU Load", 
-                    "Unit": "", 
-                    "Value": "0.08", 
-                    "Warning": "0.7"
-                }, 
-                {
-                    "Danger": "80", 
-                    "Label": "CPU Temp", 
-                    "Unit": "C", 
-                    "Value": "54.8", 
-                    "Warning": "70"
-                }, 
-                {
-                    "Danger": "85", 
-                    "Label": "RAM", 
-                    "Unit": "%", 
-                    "Value": "4.85", 
-                    "Warning": "70"
-                }, 
-                {
-                    "Danger": "80", 
-                    "Label": "SWAP", 
-                    "Unit": "%", 
-                    "Value": "0.00", 
-                    "Warning": "50"
-                }, 
-                {
-                    "Danger": "85", 
-                    "Label": "HDD", 
-                    "Unit": "%", 
-                    "Value": "6", 
-                    "Warning": "50"
-                }, 
-                {
-                    "Danger": "70", 
-                    "Label": "Storage", 
-                    "Unit": "%", 
-                    "Value": "1", 
-                    "Warning": "50"
-                }
-            ]
-        }""")
