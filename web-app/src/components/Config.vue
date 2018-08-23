@@ -45,7 +45,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
 .dropdown-menu {
   min-width: 5rem;
 }

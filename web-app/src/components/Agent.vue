@@ -1,6 +1,6 @@
 <template>
-<div class="column is-4-widescreen is-6-desktop is-6-tablet is-12-mobile">
-  <div class="card has-background-black-ter has-text-grey">
+<div class="column is-one-fifth-widescreen is-6-desktop is-6-tablet is-12-mobile">
+  <div class="card has-background-black-ter has-text-grey" :class="agent.status == 'Offline' ? 'agent-offline' : ''">
     <header class="card-header" @click="toggleContent" style="cursor: pointer;">
       <p class="card-header-title">
         <span class="has-text-white-ter">
@@ -19,7 +19,8 @@
       </p>
     </header>
     <div class="card-content" :class="contentVisible ? '' : 'is-hidden'">
-      <div> <!-- CPU | Network -->
+      <!-- CPU | Network -->
+      <div> 
         <div class="columns is-mobile is-size-7"> 
           <div class="column is-6 has-text-centered">
             <i class="fa fa-bolt is-size-5 has-text-white-ter"></i>
@@ -33,7 +34,8 @@
           </div>
         </div>
       </div>
-      <div class="group"> <!-- RAM -->
+      <!-- RAM -->
+      <div class="group"> 
         <div class="columns is-mobile">
           <div class="column is-6 has-text-white-ter has-text-centered">
             <span class="donut-peity" :data-peity="mem.ramDonut" style="display: none;">{{mem.ramUsed}},{{mem.ramFree}}</span>
@@ -67,11 +69,12 @@
           </div>
         </div>
       </div>
-      <div class="group" v-for="vol in volumes" :key="vol.label"> <!-- Volumes -->
+      <!-- Volumes -->
+      <div class="group" v-for="vol in volumes" :key="vol.label"> 
         <div class="columns is-mobile is-size-7">
           <div class="column is-3">
             <p>{{vol.label}}</p>
-            <p class="is-size-4 is-size-6-mobile has-text-white-ter">
+            <p class="is-size-5 is-size-6-mobile has-text-white-ter">
               {{vol.total}}
               <span class="is-size-6 is-size-7-mobile">GB</span>
             </p>
@@ -91,23 +94,25 @@
           </div>
         </div>
       </div>
-      <div class="group"> <!-- Distro, Kernel, Model -->
-        <div class="columns is-mobile">
+      <!-- Distro, Kernel, Model -->
+      <div class="group"> 
+        <div class="columns is-mobile is-size-7">
           <div class="column is-6">
-            <p class="is-size-7">Distro | Kernel</p>
-            <p class="has-text-white-ter is-size-7-mobile is-size-6-tablet">{{agent.distro}} | {{agent.kernel}}</p>
+            <p>Distro | Kernel</p>
+            <p class="has-text-white-ter">{{agent.distro}} | {{agent.kernel}}</p>
           </div>
           <div class="column is-6">
-            <p class="is-size-7">Model</p>
-            <p class="has-text-white-ter is-size-7-mobile is-size-6-tablet">{{agent.model}}</p>
+            <p>Model</p>
+            <p class="has-text-white-ter">{{agent.model}}</p>
           </div>
         </div>
       </div>
-      <div class="group"> <!-- System OS -->
+      <!-- Network | Agent uptime -->
+      <div class="group"> 
         <div class="columns is-mobile">
           <div class="column">
             <p class="is-size-7">Network</p>
-            <div class="is-size-7-mobile is-size-6-tablet">
+            <div class="is-size-7">
               <p class="has-text-white-ter" v-for="net in agent.network_interfaces" :key="net.ip">
                 {{net.name}}: {{net.ip}} ({{net.mac_addr}})
               </p>
@@ -117,7 +122,7 @@
         <div class="columns is-mobile" style="padding-top: 5px;">
           <div class="column">
             <p class="is-size-7">Agent uptime</p>
-            <p class="has-text-white-ter is-size-7-mobile is-size-6-tablet">{{agentUptime}}</p>
+            <p class="has-text-white-ter is-size-7">{{agentUptime}}</p>
           </div>
         </div>
       </div>
@@ -191,7 +196,7 @@ export default {
       }
       return {
         unit: ru.unit,
-        ramUsed: ru.value,
+        ramUsed: parseFloat(ru.value).toFixed(1),
         ramUsedPerc: usedPerc,
         ramFree: free,
         ramFreePerc: freePerc,
@@ -274,26 +279,30 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
 .card {
   border-radius: 6px;
+  padding-bottom: 10px;
 }
 .card-content {
-  padding: 1rem;
+  padding: 0.3rem;
 }
 .group {
   border-top: 1px solid #333131;
   padding-top: 10px;
-  margin: 10px 0 10px 0;
+  margin: 20px 0 10px 0;
 }
 .columns {
   margin: 0px;
 }
-.column {
+.card-content .column {
   padding-top: 0px;
   padding-bottom: 0px;
 }
 .border-left {
   border-left: 1px solid #333131;
+}
+.agent-offline {
+  opacity: 0.85;
 }
 </style>

@@ -21,7 +21,6 @@ Vue.config.productionTip = false
 const server = new ServerSocket(process.env.SOCKET_SERVER_URL, 5000)
 server.connect()
 server.handleMessage = function (message) {
-  console.log(message)
   switch (message.action) {
     case 'registered_agents':
       store.state.agents = message.content.registered

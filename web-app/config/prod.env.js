@@ -1,4 +1,4 @@
 module.exports = {
   NODE_ENV: '"production"',
-  SOCKET_SERVER_URL: '"ws://head01.hydra:5000"'
+  SOCKET_SERVER_URL: '"ws://yetis.sytes.net:5000"'
 }
