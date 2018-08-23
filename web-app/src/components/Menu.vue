@@ -1,8 +1,8 @@
 <template>
   <nav class="level is-mobile">
     <div class="level-left">
-      <div class="level-item has-text-centered">
-        <h1 class="title">HYDRA</h1>
+      <div class="level-item has-text-centered" style="margin-top: 10px; margin-left: 10px;">
+        <h1 class="title">hydra</h1>
       </div>
     </div>
     <div class="level-right">
@@ -27,3 +27,19 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+@import url('https://fonts.googleapis.com/css?family=Audiowide|Orbitron');
+
+.title {
+  font-family: 'Orbitron', cursive;
+  font-size: 42px;
+  font-style: normal;
+  font-weight: 200;
+  text-shadow: 1px 1px 8px #333333;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  padding: 10px, 0 0 10px;
+}
+</style>
+

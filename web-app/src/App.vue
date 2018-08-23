@@ -10,7 +10,7 @@
     <cluster></cluster>
   </div>
   <div class="hero-foot">
-    <p class="content has-text-centered is-size-7">
+    <p class="content has-text-centered is-size-7 has-text-white">
       Hydra Raspberry Pi Cluster Monitor - <strong>v1.0</strong>
     </p>
   </div>
