@@ -42,10 +42,8 @@ func (agent *Agent) Update() {
 	agent.Hostname, _ = os.Hostname()
 	agent.IP = getOutboundIP().To4().String()
 	getInterfaces(&agent.NetworkInterfaces)
-	outputJSON, err := ExecuteCommand()
-	if err != nil {
-		json.Unmarshal(outputJSON, agent)
-	}
+	outputJSON, _ := ExecuteCommand()
+	json.Unmarshal(outputJSON, agent)
 }
 
 // NewAgent returns a new node intance
