@@ -18,7 +18,7 @@ const (
 	// Time allowed to write a message to the peer.
 	writeWait = 10 * time.Second
 	// Interval to send ping message to client
-	pingPeriod = 60 * time.Second
+	pingPeriod = 10 * time.Second
 )
 
 // Client is a middleman between the websocket connection and the hub.
@@ -80,13 +80,16 @@ func (c *Client) write() {
 
 //Close end this client
 func (c *Client) Close() {
+	if c.mode == "agent" && c.hub == nil {
+		c.conn.WriteJSON(NewMessage("clients", c.id, "agent_disconnected", "", c.id))
+	}
 	c.conn.Close()
 	close(c.send)
 	connectionClosed = true
 	if c.hub != nil {
 		c.hub.unregister <- c
 	}
-	log.Printf("\033[93mDisconnected\033[0m: %s", c.id)
+	log.Printf("\033[93mdisconnected\033[0m: %s", c.id)
 }
 
 // Run start the client read and write handlers

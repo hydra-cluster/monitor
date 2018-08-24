@@ -7,55 +7,53 @@
     </a>
     <div class="modal" :class="active ? 'is-active' : ''">
       <div class="modal-background" @click="closeModal"></div>
-      <div class="modal-card">
-        <header class="modal-card-head">
-          <p class="modal-card-title">Execute command</p>
-          <button class="delete" @click="closeModal"></button>
-        </header>
-        <section class="modal-card-body">
-          <div class="columns">
-            <div class="column is-one-third has-text-grey-dark">
-              <div class="field" v-for="agent in agents" :key="agent.hostname">
-                <input :id="agent.hostname" type="checkbox" :value="agent.hostname" class="switch is-rounded" v-model="checkedAgents">
-                <label :for="agent.hostname">{{agent.hostname}}</label>
-              </div>
-            </div>
-            <div class="column">
-              <div class="field">
-                <div class="control has-text-grey-dark">
-                  <label class="radio">
-                    <input type="radio" name="action" value="reboot" v-model="action">
-                    Reboot
-                  </label>
-                  <label class="radio">
-                    <input type="radio" name="action" value="shutdown" v-model="action">
-                    Shutdown
-                  </label>
-                  <label class="radio">
-                    <input type="radio" name="action" value="custom" v-model="action">
-                    Custom
-                  </label>
+      <div class="card is-size-7">
+        <div class="card-content">
+          <div>
+            <div class="columns">
+              <div class="column is-one-third has-text-grey-dark hydra-column-modal">
+                <div class="field" v-for="agent in agents" :key="agent.hostname">
+                  <input :id="agent.hostname" type="checkbox" :value="agent.hostname" class="switch is-rounded" v-model="checkedAgents">
+                  <label :for="agent.hostname">{{agent.hostname}}</label>
                 </div>
               </div>
-              <div class="field" :class="action === 'custom' ? '' : 'is-hidden' ">
-                <div class="control">
-                  <textarea class="textarea" placeholder="Custom Command" v-model="command" rows="2"></textarea>
+              <div class="column hydra-column-modal">
+                <div class="field">
+                  <div class="control has-text-grey-dark">
+                    <label class="radio">
+                      <input type="radio" name="action" value="reboot" v-model="action">
+                      Reboot
+                    </label>
+                    <label class="radio">
+                      <input type="radio" name="action" value="shutdown" v-model="action">
+                      Shutdown
+                    </label>
+                    <label class="radio">
+                      <input type="radio" name="action" value="custom" v-model="action">
+                      Custom
+                    </label>
+                  </div>
                 </div>
-              </div>
-              <div class="field">
-                <p class="control has-icons-left">
-                  <input class="input" type="password" placeholder="Password" v-model="password">
-                  <span class="icon is-small is-left">
-                    <i class="fa fa-lock"></i>
-                  </span>
-                </p>
+                <div class="field" :class="action === 'custom' ? '' : 'is-hidden' ">
+                  <div class="control">
+                    <textarea class="textarea" placeholder="Custom Command" v-model="command" rows="2"></textarea>
+                  </div>
+                </div>
+                <div class="field">
+                  <p class="control has-icons-left">
+                    <input class="input" type="password" placeholder="Password" v-model="password">
+                    <span class="icon is-small is-left">
+                      <i class="fa fa-lock"></i>
+                    </span>
+                  </p>
+                </div>
               </div>
             </div>
           </div>
-        </section>
-        <footer class="modal-card-foot">
-          <button class="button is-success" @click="newTask">Create task</button>
-          <button class="button" @click="closeModal">Cancel</button>
+        </div>
+        <footer class="card-foot" style="padding-left: 15px">
+          <button class="button is-small is-success" @click="newTask">Create task</button>
+          <button class="button is-small" @click="closeModal">Cancel</button>
         </footer>
       </div>
     </div>
@@ -124,5 +122,8 @@ export default {
 <style>
 .checkbox + .checkbox {
     margin-left: .5em;
+}
+.hydra-column-modal {
+  padding: 15px;
 }
 </style>

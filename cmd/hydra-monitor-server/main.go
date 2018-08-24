@@ -63,10 +63,8 @@ func handlerReadMessage(msg *socket.Message) {
 				Status:  "200",
 				Content: agents,
 			})
-	case "update_agent_data":
-		socket.ServerHub.Emit(msg)
 	case "execute_task":
-		if strings.Contains(msg.From, "web") {
+		if strings.Contains(msg.From, "client.") {
 			var objmap map[string]*json.RawMessage
 			jsonBytes, _ := json.Marshal(msg.Content)
 			json.Unmarshal(jsonBytes, &objmap)
@@ -76,7 +74,6 @@ func handlerReadMessage(msg *socket.Message) {
 			json.Unmarshal(*objmap["task"], &task)
 			//invalid password
 			if pwd != clusterPassword {
-				task.Output = "Unauthorized - invalid password"
 				task.Status = "Invalid password"
 				task.End = time.Now()
 				socket.ServerHub.Emit(
@@ -89,7 +86,7 @@ func handlerReadMessage(msg *socket.Message) {
 					})
 				return
 			}
-			//broadcast to all web clients and agents the new task processing
+			//broadcast to all web clients and agents the new task
 			task.Status = "Processing"
 			socket.ServerHub.Emit(
 				&socket.Message{
@@ -99,8 +96,15 @@ func handlerReadMessage(msg *socket.Message) {
 					Status:  "200",
 					Content: task,
 				})
-		} else if strings.Contains(msg.From, "head") {
+		} else {
+			task := monitor.Task{}
+			jsonBytes, _ := json.Marshal(msg.Content)
+			json.Unmarshal(jsonBytes, &task)
+			task.UpdateStatus()
+			msg.Content = task
 			socket.ServerHub.Emit(msg)
 		}
+	default:
+		socket.ServerHub.Emit(msg)
 	}
 }

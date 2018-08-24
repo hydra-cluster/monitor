@@ -1,7 +1,7 @@
 import store from './store'
 
-const uuid = 'web' + Math.floor(new Date().valueOf() * Math.random()) + '.hydra'
-const urlParams = '/ws?id=' + uuid + '&mode=web'
+const uuid = 'client.' + Math.floor(new Date().valueOf() * Math.random()) + '.hydra'
+const urlParams = '/ws?id=' + uuid + '&mode=client'
 
 export default class ServerSocket {
   constructor (serverURL, timeToReconnect) {

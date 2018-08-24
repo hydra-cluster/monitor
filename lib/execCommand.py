@@ -23,9 +23,12 @@ parser.add_argument("-cmd", help="Define a command to be executed if not defined
 args = parser.parse_args()
 
 if args.cmd:
-    print("execute new command: " + args.cmd)
-    output = subprocess.check_output(args.cmd, shell = True)
-    print(output)
+    try:
+        output = subprocess.check_output(args.cmd, stderr=subprocess.STDOUT, shell = True)
+        result = {'status': 'done', 'output': output}
+    except subprocess.CalledProcessError as e:
+        result = {'status': 'error', 'output': e.output}
+    print(json.dumps(result, default=lambda o: o.__dict__, sort_keys=True, indent=4))
 else: 
     n = Node()
 
@@ -84,5 +87,21 @@ else:
         value = subprocess.check_output(cmd, shell = True )
         n.Params.append(Param(value, "Storage Used", "Bytes", "70", "85" ))
     
+    else :
+        n.Kernel = "Testing..."
+        n.Distro = "Testing..."
+        n.Model = "Testing..."
+        n.Params.append(Param("0", "CPU Load", "", "0.7", "0.9" ))
+        n.Params.append(Param("0", "CPU Temp", "C", "70", "80" ))
+        n.Params.append(Param("0", "CPU Freq", "Hz", "", "" ))
+        n.Params.append(Param("0", "RAM Total", "MB", "70", "85" ))
+        n.Params.append(Param("0", "RAM Used", "MB", "70", "85" ))
+        n.Params.append(Param("0", "SWAP Total", "MB", "50", "80" ))
+        n.Params.append(Param("0", "SWAP Used", "MB", "50", "80" ))
+        n.Params.append(Param("0", "SD Card Total", "Bytes", "50", "85" ))
+        n.Params.append(Param("0", "SD Card Used", "Bytes", "50", "85" ))
+        n.Params.append(Param("0", "Storage Total", "Bytes", "70", "85" ))
+        n.Params.append(Param("0", "Storage Used", "Bytes", "70", "85" ))
+
     print(n.toJSON())
     

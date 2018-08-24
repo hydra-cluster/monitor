@@ -1,6 +1,6 @@
 <template>
 <div class="container is-fluid" style="margin: 0px;">
-  <div class="columns is-multiline">
+  <div class="columns is-multiline" :class="agents.length < 5 ? 'is-centered' : ''">
     <agent v-for="agent in agents" :key="agent.hostname"></agent>
   </div>
 </div>

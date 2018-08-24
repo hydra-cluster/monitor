@@ -1,5 +1,5 @@
 <template>
-<div class="column is-one-fifth-widescreen is-6-desktop is-6-tablet is-12-mobile">
+<div class="column is-6-desktop is-6-tablet is-12-mobile" :class="totalAgentsRegistered >= 5 ? 'is-one-fifth-widescreen' : 'is-3-widescreen'">
   <div class="card has-background-black-ter has-text-grey" :class="agent.status == 'Offline' ? 'agent-offline' : ''">
     <header class="card-header" @click="toggleContent" style="cursor: pointer;">
       <p class="card-header-title">
@@ -137,6 +137,9 @@ export default {
   computed: {
     agent () {
       return this.$store.getters.getAgentByHostname(this.$vnode.key)
+    },
+    totalAgentsRegistered () {
+      return this.$store.getters.getAgents.length
     },
     status () {
       if (this.agent.status === 'Online') {

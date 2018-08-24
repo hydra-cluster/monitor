@@ -52,7 +52,7 @@ func main() {
 		<-c
 		fmt.Println("")
 		client.Close()
-		log.Println("Agent terminated")
+		log.Println("\033[91magent terminated\033[0m")
 		os.Exit(1)
 	}()
 
@@ -76,14 +76,13 @@ func handlerReadMessage(msg *socket.Message) {
 		jsonBytes, _ := json.Marshal(msg.Content)
 		json.Unmarshal(jsonBytes, &task)
 		if strings.Contains(task.Target, agent.Hostname) {
-			output, err := monitor.ExecuteCommand(task.ParseCommand())
-			if err != nil {
-				task.Status = "Error"
-				task.Output = err.Error()
-			} else {
-				task.Status = "Done"
-				task.Output = string(output)
+			taskOutput := monitor.AgentOutput{
+				Hostname: agent.Hostname,
+				End:      time.Now(),
 			}
+			jsonResult, _ := monitor.ExecuteCommand(task.ParseCommand())
+			json.Unmarshal(jsonResult, &taskOutput)
+			task.AgentsOutput = append(task.AgentsOutput, taskOutput)
 			client.Emit(socket.NewMessage("clients", agent.Hostname, msg.Action, "200", task))
 		}
 	}

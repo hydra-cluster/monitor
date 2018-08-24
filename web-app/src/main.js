@@ -31,6 +31,9 @@ server.handleMessage = function (message) {
     case 'execute_task':
       store.commit('updateTask', message.content)
       break
+    case 'agent_disconnected':
+      store.commit('disconnectAgent', message.content)
+      break
   }
 }
 

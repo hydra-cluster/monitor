@@ -48,6 +48,10 @@ export default new Vuex.Store({
       }
       state.agents.push(agent)
     },
+    disconnectAgent (state, hostname) {
+      const agent = state.agents.find(agent => agent.hostname === hostname)
+      Vue.set(agent, 'status', 'Offline')
+    },
     updateTask (state, task) {
       const taskIndex = _.findIndex(state.tasks, {'id': task.id})
       if (taskIndex !== -1) {

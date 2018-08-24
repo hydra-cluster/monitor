@@ -49,7 +49,7 @@ func (h *Hub) run() {
 			}
 		case message := <-h.webClients:
 			for client := range h.clients {
-				if client.mode == "web" {
+				if client.mode == "client" {
 					client.send <- message
 				}
 			}
