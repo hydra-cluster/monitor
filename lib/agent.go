@@ -40,7 +40,12 @@ type networkInterface struct {
 func (agent *Agent) Update() {
 	agent.LastUpdatedDate = time.Now()
 	agent.Hostname, _ = os.Hostname()
-	agent.IP = getOutboundIP().To4().String()
+	ip := getOutboundIP()
+	if ip == nil {
+		agent.IP = "Outbound IP N/D"
+	} else {
+		agent.IP = ip.To4().String()
+	}
 	getInterfaces(&agent.NetworkInterfaces)
 	outputJSON, _ := ExecuteCommand()
 	json.Unmarshal(outputJSON, agent)

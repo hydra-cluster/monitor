@@ -1,7 +1,6 @@
 package lib
 
 import (
-	"log"
 	"net"
 	"os/exec"
 )
@@ -9,7 +8,7 @@ import (
 func getOutboundIP() net.IP {
 	conn, err := net.Dial("udp", "8.8.8.8:80")
 	if err != nil {
-		log.Fatal(err)
+		return nil
 	}
 	defer conn.Close()
 
