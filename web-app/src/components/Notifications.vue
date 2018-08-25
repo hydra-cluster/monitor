@@ -8,17 +8,12 @@
         </span>
       </button>
     </div>
-    <div class="dropdown-menu" role="menu">
-      <div class="dropdown-content">
+    <div>
+    <div class="dropdown-menu" style="min-width: 23rem;" role="menu">
+      <div class="dropdown-content has-background-white-bis has-text-grey-dark" style="padding: 0.5rem;">
         <notification-item v-for="task in tasks" :key="task.id"></notification-item>
-        <hr class="dropdown-divider">
-        <a class="dropdown-item" @click="clearAllTasks">
-          <span class="icon is-medium">
-            <i class="fa fa-lg fa-trash"></i>
-          </span>
-          Clear all tasks
-        </a>
       </div>
+    </div>
     </div>
   </div>
 </div>
@@ -62,8 +57,8 @@ export default {
 }
 </script>
 
-<style scope='local'>
+<style>
 .dropdown-menu {
-    min-width: 21rem;
+  top: 45px!important;
 }
 </style>
