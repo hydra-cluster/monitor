@@ -61,9 +61,7 @@ func main() {
 		select {
 		case <-ticker.C:
 			agent.Update()
-			if agent.Status != "Executing task" {
-				agent.Status = "Online"
-			}
+			agent.Status = "Online"
 			err := client.Emit(socket.NewMessage("clients", agent.Hostname, "update_agent_data", "", agent))
 			if err != nil {
 				return
@@ -74,11 +72,11 @@ func main() {
 
 func handlerReadMessage(msg *socket.Message) {
 	if msg.Action == "execute_task" {
-		agent.Status = "Executing task"
 		task := monitor.Task{}
 		jsonBytes, _ := json.Marshal(msg.Content)
 		json.Unmarshal(jsonBytes, &task)
 		if strings.Contains(task.Target, agent.Hostname) {
+			log.Println("begin task execution...")
 			taskOutput := monitor.AgentOutput{
 				Hostname: agent.Hostname,
 				End:      time.Now(),
@@ -87,7 +85,7 @@ func handlerReadMessage(msg *socket.Message) {
 			json.Unmarshal(jsonResult, &taskOutput)
 			task.AgentsOutput = append(task.AgentsOutput, taskOutput)
 			client.Emit(socket.NewMessage("clients", agent.Hostname, msg.Action, "200", task))
+			log.Println("task complete")
 		}
-		agent.Status = "Online"
 	}
 }
