@@ -61,7 +61,9 @@ func main() {
 		select {
 		case <-ticker.C:
 			agent.Update()
-			agent.Status = "Online"
+			if agent.Status != "Executing task" {
+				agent.Status = "Online"
+			}
 			err := client.Emit(socket.NewMessage("clients", agent.Hostname, "update_agent_data", "", agent))
 			if err != nil {
 				return
@@ -72,6 +74,7 @@ func main() {
 
 func handlerReadMessage(msg *socket.Message) {
 	if msg.Action == "execute_task" {
+		agent.Status = "Executing task"
 		task := monitor.Task{}
 		jsonBytes, _ := json.Marshal(msg.Content)
 		json.Unmarshal(jsonBytes, &task)
@@ -85,5 +88,6 @@ func handlerReadMessage(msg *socket.Message) {
 			task.AgentsOutput = append(task.AgentsOutput, taskOutput)
 			client.Emit(socket.NewMessage("clients", agent.Hostname, msg.Action, "200", task))
 		}
+		agent.Status = "Online"
 	}
 }
