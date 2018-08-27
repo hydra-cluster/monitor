@@ -1,20 +1,12 @@
 <template>
 <div class="level-item">
-  <div class="dropdown is-right" :class="active ? 'is-active' : ''">
-    <div class="dropdown-trigger">
-      <button class="button" aria-haspopup="true" @click="toggleDropDown" :disabled="tasks.length === 0">
-        <span class="icon is-small badge is-badge-link" :data-badge="tasks.length">
-          <i class="fa fa-bell"></i>
-        </span>
-      </button>
-    </div>
-    <div>
-    <div class="dropdown-menu" style="min-width: 23rem;" role="menu">
-      <div class="dropdown-content has-background-white-bis has-text-grey-dark" style="padding: 0.5rem;">
-        <notification-item v-for="task in tasks" :key="task.id"></notification-item>
-      </div>
-    </div>
-    </div>
+  <button class="button" aria-haspopup="true" @click="toggleSidenav" :disabled="tasks.length === 0">
+    <span class="icon is-small badge is-badge-link" :data-badge="tasks.length">
+      <i class="fa fa-bell"></i>
+    </span>
+  </button>
+  <div id="notifications" class="sidenav has-text-grey-dark">
+    <notification-item v-for="task in tasks" :key="task.id"></notification-item>
   </div>
 </div>
 </template>
@@ -37,14 +29,26 @@ export default {
     }
   },
   methods: {
-    toggleDropDown () {
-      if (this.tasks.length > 0) {
-        this.active = !this.active
+    toggleSidenav () {
+      if (!this.active) {
+        this.openSidenav()
+      } else {
+        this.closeSidenav()
       }
+    },
+    openSidenav () {
+      this.active = true
+      document.getElementById('notifications').style.width = '350px'
+      document.getElementById('main').style.marginRight = '350px'
+    },
+    closeSidenav () {
+      this.active = false
+      document.getElementById('notifications').style.width = '0'
+      document.getElementById('main').style.marginRight = '0'
     },
     clearAllTasks () {
       this.$store.commit('removeAllTasks')
-      this.active = false
+      this.closeSidenav()
     }
   },
   watch: {
@@ -59,6 +63,24 @@ export default {
 
 <style>
 .dropdown-menu {
-  top: 45px!important;
+  top: 40px!important;
+}
+#main {
+  transition: margin-right .5s;
+}
+.sidenav {
+  height: 100%;
+  width: 0;
+  position: fixed;
+  z-index: 31;
+  top: 0;
+  right: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  transition: 0.5s;
+  margin-top: 60px;
+  border-top-left-radius: 6px;
+  background-color: rgba(255,255,255,0.95);
+  padding-top: 1rem;
 }
 </style>

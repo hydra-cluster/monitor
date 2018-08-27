@@ -6,7 +6,7 @@
   <div class="hero-head">
     <cluster-menu></cluster-menu>
   </div>
-  <div class="hero-body">
+  <div class="hero-body" id="main">
     <cluster></cluster>
   </div>
   <div class="hero-foot">

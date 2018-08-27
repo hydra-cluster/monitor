@@ -100,4 +100,7 @@ export default {
   margin: 0px!important; 
   height: 3px!important;
 }
+.sidenav .media-left {
+  padding: 25px 0 0 5px;
+}
 </style>
