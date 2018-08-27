@@ -103,7 +103,7 @@ export default {
       const task = {
         id: 'task.' + Math.floor(new Date().valueOf() * Math.random()),
         owner: this.$store.state.clientID,
-        action: this.customCommand ? 'Custom command' : this.action.toLowerCase(),
+        action: this.customCommand ? 'Custom command' : this.action,
         command: this.customCommand ? this.command : this.action,
         target: this.$_.join(this.checkedAgents, ','),
         status: 'Requested',

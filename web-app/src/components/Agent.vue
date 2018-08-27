@@ -11,7 +11,7 @@
         </span>
       </p>
       <p class="card-header-icon">
-        <span class="is-size-7 has-text-right" style="padding-right: 12px;">{{agent.status}}<br>{{agent.ip}}</span>
+        <span class="is-size-7 has-text-right" style="padding-right: 12px;">{{agent.status}}</span>
         <br>
         <span class="icon">
           <i class="fa fa-2x fa-server" :class="status"></i>

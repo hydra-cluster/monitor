@@ -45,16 +45,12 @@ export default {
       this.active = false
       document.getElementById('notifications').style.width = '0'
       document.getElementById('main').style.marginRight = '0'
-    },
-    clearAllTasks () {
-      this.$store.commit('removeAllTasks')
-      this.closeSidenav()
     }
   },
   watch: {
     tasks: function (value) {
       if (value.length <= 0) {
-        this.active = false
+        this.closeSidenav()
       }
     }
   }
