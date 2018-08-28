@@ -76,7 +76,6 @@ func handlerReadMessage(msg *socket.Message) {
 		jsonBytes, _ := json.Marshal(msg.Content)
 		json.Unmarshal(jsonBytes, &task)
 		if strings.Contains(task.Target, agent.Hostname) {
-			log.Println("begin task execution...")
 			taskOutput := monitor.AgentOutput{
 				Hostname: agent.Hostname,
 				End:      time.Now(),
@@ -85,7 +84,6 @@ func handlerReadMessage(msg *socket.Message) {
 			json.Unmarshal(jsonResult, &taskOutput)
 			task.AgentsOutput = append(task.AgentsOutput, taskOutput)
 			client.Emit(socket.NewMessage("clients", agent.Hostname, msg.Action, "200", task))
-			log.Println("task complete")
 		}
 	}
 }

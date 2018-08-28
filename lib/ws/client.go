@@ -2,7 +2,6 @@ package ws
 
 import (
 	"errors"
-	"fmt"
 	"log"
 	"time"
 
@@ -11,6 +10,7 @@ import (
 
 var (
 	connectionClosed = false
+	connected        = false
 	serverURL        = ""
 )
 
@@ -38,11 +38,16 @@ type Client struct {
 
 func (c *Client) read() {
 	for {
-		var msg Message
-		if err := c.conn.ReadJSON(&msg); err != nil {
-			return
+		if connected {
+			var msg Message
+			if err := c.conn.ReadJSON(&msg); err != nil {
+				if serverURL == "" {
+					return
+				}
+				connected = false
+			}
+			c.readHandler(&msg)
 		}
-		c.readHandler(&msg)
 	}
 }
 
@@ -61,6 +66,7 @@ func (c *Client) write() {
 			if err := c.conn.WriteJSON(message); err != nil {
 				if serverURL != "" {
 					c.conn = reconnect()
+					connected = true
 				} else {
 					return
 				}
@@ -70,6 +76,7 @@ func (c *Client) write() {
 			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
 				if serverURL != "" {
 					c.conn = reconnect()
+					connected = true
 				} else {
 					return
 				}
@@ -94,6 +101,7 @@ func (c *Client) Close() {
 
 // Run start the client read and write handlers
 func (c *Client) Run() {
+	connected = true
 	go c.read()
 	go c.write()
 }
@@ -124,6 +132,7 @@ func Dial(url, id, mode string, readHandler func(*Message)) *Client {
 }
 
 func reconnect() *websocket.Conn {
+	connected = false
 	if connectionClosed {
 		return nil
 	}
@@ -132,12 +141,9 @@ func reconnect() *websocket.Conn {
 	for {
 		attemp++
 		time.Sleep(5 * time.Second)
-		dateStr := time.Now().Format("2006/01/02 15:04:05")
-		fmt.Printf("\r%s attempting %03d to reconnect", dateStr, attemp)
 		conn, _, err := websocket.DefaultDialer.Dial(serverURL, nil)
 		if err == nil {
-			fmt.Println("")
-			log.Println("\033[92magent reconnected successfully\033[0m")
+			log.Printf("\033[92magent reconnected successfully (%d)\033[0m", attemp)
 			return conn
 		}
 	}
