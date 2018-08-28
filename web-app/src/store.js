@@ -33,6 +33,12 @@ export default new Vuex.Store({
     getTaskByID: (state) => (id) => {
       return state.tasks.find(task => task.id === id)
     },
+    executingTaskForAgent: (state) => (hostname) => {
+      const index = _.findIndex(state.tasks, function (task) {
+        return task.status === 'Processing' && _.includes(task.target, hostname)
+      })
+      return index !== -1
+    },
     taskInProgress (state) {
       return state.taskInProgress
     },
@@ -69,10 +75,9 @@ export default new Vuex.Store({
       if (taskIndex !== -1) {
         state.tasks.splice(taskIndex, 1)
       }
-    },
-    removeAllTasks (state) {
-      state.tasks = []
-      state.taskInProgress = false
+      if (state.tasks.length === 0) {
+        state.taskInProgress = false
+      }
     },
     setAgentContentVisible (state, agent) {
       const agentIndex = _.findIndex(state.agentsContentVisible, {'hostname': agent.hostname})

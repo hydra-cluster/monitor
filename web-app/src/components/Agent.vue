@@ -11,10 +11,10 @@
         </span>
       </p>
       <p class="card-header-icon">
-        <span class="is-size-7 has-text-right" style="padding-right: 12px;">{{agent.status}}</span>
+        <span class="is-size-7 has-text-right" style="padding-right: 12px;">{{statusLabel}}</span>
         <br>
         <span class="icon">
-          <i class="fa fa-2x fa-server" :class="status"></i>
+          <i class="fa fa-2x fa-server" :class="statusClass"></i>
         </span>
       </p>
     </header>
@@ -22,9 +22,11 @@
       <!-- CPU | Network -->
       <div> 
         <div class="columns is-mobile is-size-7"> 
-          <div class="column is-6 has-text-centered">
+          <div class="column is-3 has-text-centered">
             <i class="fa fa-bolt is-size-5 has-text-white-ter"></i>
             <span style="margin-right: 10px;">{{cpu.freq}}</span>
+          </div>
+          <div class="column is-3 has-text-centered">
             <i class="fa fa-thermometer-half is-size-5" :class="cpu.tempColor"></i>
             <span>{{cpu.tempLabel}}</span>
           </div>
@@ -141,10 +143,13 @@ export default {
     totalAgentsRegistered () {
       return this.$store.getters.getAgents.length
     },
-    status () {
-      if (this.agent.status === 'Online') {
+    statusLabel () {
+      return this.$store.getters.executingTaskForAgent(this.agent.hostname) ? 'Task' : this.agent.status
+    },
+    statusClass () {
+      if (this.statusLabel === 'Online') {
         return 'has-text-primary'
-      } else if (this.agent.status === 'Offline') {
+      } else if (this.statusLabel === 'Offline') {
         return 'has-text-danger'
       }
       return 'has-text-warning'
