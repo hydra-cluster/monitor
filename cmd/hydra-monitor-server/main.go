@@ -18,8 +18,9 @@ import (
 const clusterPassword = "pipocadoce"
 
 var (
-	agents *AgentsManager
-	folder *string
+	agents      *AgentsManager
+	folder      *string
+	currentTask monitor.Task
 )
 
 func main() {
@@ -70,38 +71,39 @@ func handlerReadMessage(msg *socket.Message) {
 			json.Unmarshal(jsonBytes, &objmap)
 			var pwd string
 			json.Unmarshal(*objmap["password"], &pwd)
-			task := monitor.Task{}
-			json.Unmarshal(*objmap["task"], &task)
+			currentTask = monitor.Task{}
+			json.Unmarshal(*objmap["task"], &currentTask)
 			//invalid password
 			if pwd != clusterPassword {
-				task.Status = "Invalid password"
-				task.End = time.Now()
+				currentTask.Status = "Invalid password"
+				currentTask.End = time.Now()
 				socket.ServerHub.Emit(
 					&socket.Message{
 						Action:  msg.Action,
 						To:      msg.From,
 						From:    "server",
 						Status:  "401",
-						Content: task,
+						Content: currentTask,
 					})
 				return
 			}
 			//broadcast to all web clients and agents the new task
-			task.Status = "Processing"
+			currentTask.Status = "Processing"
 			socket.ServerHub.Emit(
 				&socket.Message{
 					Action:  msg.Action,
 					To:      "all",
 					From:    "server",
 					Status:  "200",
-					Content: task,
+					Content: currentTask,
 				})
 		} else {
 			task := monitor.Task{}
 			jsonBytes, _ := json.Marshal(msg.Content)
 			json.Unmarshal(jsonBytes, &task)
-			task.UpdateStatus()
-			msg.Content = task
+			currentTask.AgentsOutput = append(currentTask.AgentsOutput, task.AgentsOutput[0])
+			currentTask.UpdateStatus()
+			msg.Content = currentTask
 			socket.ServerHub.Emit(msg)
 		}
 	default:
